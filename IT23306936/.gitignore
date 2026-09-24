@@ -1,0 +1,25 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Large captures and test logs
+logs/*.log
+results/controlled_lifecycle_*/
+*.pcap
+*.csv
+*.parquet
+
+# OS generated
+.DS_Store
+Thumbs.db
+desktop.ini

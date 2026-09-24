@@ -1,0 +1,20 @@
+{
+  "ECG_Monitoring": {
+    "criticality": "critical",
+    "target_ip": "10.0.0.2",
+    "protocol": "udp",
+    "port": 5202,
+    "qos": {
+      "min_throughput_kbps": 90,
+      "max_loss_percent": 1,
+      "max_delay_ms": null
+    }
+  },
+  "Background_Traffic": {
+    "criticality": "noncritical",
+    "target_ip": "10.0.0.2",
+    "protocol": "udp",
+    "port": 5201,
+    "qos": null
+  }
+}
