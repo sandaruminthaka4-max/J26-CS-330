@@ -1,0 +1,20 @@
+{
+  "dataset_name": "CICIoMT2024",
+  "official_source": "https://www.unb.ca/cic/datasets/iomt-dataset-2024.html",
+  "citation": "Dadkhah et al., 'CICIoMT2024: A benchmark dataset for multi-protocol security assessment in IoMT', Internet of Things, 2024",
+  "archive_filename": "CICIoMT2024 DataSets.zip",
+  "archive_size_bytes": 176189892,
+  "archive_size_mb": 168.03,
+  "archive_sha256": "8da94655b1b6ab40eeb1ae7306fb86e0b1bc1f126355bb3d21a70b7f01623b2d",
+  "generation_timestamp_utc": "2026-10-17T03:02:06.742381+00:00",
+  "individual_scope": "Multi-Class Reconnaissance Attack Detection (Benign, Ping Sweep, Port Scan, OS Scan, Vulnerability Scan)",
+  "excluded_attack_families": [
+    "DoS (UDP, SYN, ICMP, TCP, Connect Flood, Publish Flood)",
+    "DDoS (UDP, ICMP, TCP, SYN, Publish Flood)",
+    "Spoofing (ARP Spoofing)",
+    "MQTT Anomalies (Malformed Data)"
+  ],
+  "metadata": {
+    "extracted_by": "Bandara B.R.K.Y (IT23285224)"
+  }
+}
