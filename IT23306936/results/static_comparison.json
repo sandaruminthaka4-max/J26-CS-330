@@ -1,0 +1,63 @@
+{
+  "mode": "adaptive_vs_static_udp_block",
+  "static_scope": "All UDP from 10.0.0.1 to 10.0.0.2",
+  "rate_limit_kbps": 1000,
+  "measurements": [
+    {
+      "scenario": "baseline",
+      "sensor_metrics": {
+        "receiver_kbps": 22.852,
+        "packet_loss_percent": 77.011,
+        "jitter_ms": 9.782
+      },
+      "load_metrics": {
+        "receiver_kbps": 1805.447,
+        "packet_loss_percent": 63.401,
+        "jitter_ms": 4.444
+      },
+      "sensor_qos_review": {
+        "decision": "review_required",
+        "reasons": [
+          "Sensor throughput below test threshold",
+          "Sensor packet loss above test threshold"
+        ],
+        "thresholds": {
+          "min_throughput_kbps": 90,
+          "max_loss_percent": 1
+        }
+      }
+    },
+    {
+      "scenario": "limited",
+      "sensor_metrics": {
+        "receiver_kbps": 100.721,
+        "packet_loss_percent": 0,
+        "jitter_ms": 6.709
+      },
+      "load_metrics": {
+        "receiver_kbps": 987.518,
+        "packet_loss_percent": 80.171,
+        "jitter_ms": 0.058
+      },
+      "sensor_qos_review": {
+        "decision": "no_change_recommended",
+        "reasons": [],
+        "thresholds": {
+          "min_throughput_kbps": 90,
+          "max_loss_percent": 1
+        }
+      }
+    },
+    {
+      "scenario": "static_udp_block",
+      "measurement_method": "Numbered UDP packets on port 5203",
+      "sent_packets": 1000,
+      "received_packets": 0,
+      "packet_loss_percent": 100.0
+    }
+  ],
+  "reassessment": {
+    "performed": false,
+    "reason": "Sensor QoS meets test thresholds"
+  }
+}
