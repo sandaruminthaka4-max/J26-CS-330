@@ -1,0 +1,31 @@
+============================================================
+MQTT ANOMALY & MITM-SUSPICION DETECTOR — EVALUATION REPORT (Stage 3)
+Dataset: CICIoMT2024
+============================================================
+Accuracy             : 0.9954
+Precision            : 0.9995
+Recall               : 0.9956
+F1-Score             : 0.9976
+False Positive Rate  : 0.0075
+Inference Latency    : 0.004 ms / sample
+
+Classification Report:
+              precision    recall  f1-score   support
+
+      Normal       0.94      0.99      0.96      1600
+  Suspicious       1.00      1.00      1.00     24736
+
+    accuracy                           1.00     26336
+   macro avg       0.97      0.99      0.98     26336
+weighted avg       1.00      1.00      1.00     26336
+
+
+Confusion Matrix (Normal, Suspicious):
+[[ 1588    12]
+ [  108 24628]]
+
+NOTE ON MITM:
+'Suspicious' detects MITM-enabling patterns (ARP Spoofing, MQTT Malformed Data)
+and other IoMT attacks. Predictions should be interpreted as Suspicious behavior,
+not definitive proof of Man-in-the-Middle traffic.
+============================================================
