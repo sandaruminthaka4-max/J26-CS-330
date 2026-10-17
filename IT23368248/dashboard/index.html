@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IoMT Healthcare Protocol Anomaly Detection & MITM Threat Alert Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0a0e17;
+      --card-bg: #111827;
+      --card-border: #1f293d;
+      --accent-blue: #3b82f6;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-yellow: #f59e0b;
+      --accent-purple: #8b5cf6;
+      --accent-cyan: #06b6d4;
+      --accent-rose: #f43f5e;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 20px;
+    }
+
+    .header-title h1 {
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge-scope {
+      background: rgba(139, 92, 246, 0.2);
+      color: var(--accent-purple);
+      border: 1px solid var(--accent-purple);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .badge-id {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid var(--accent-cyan);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .badge-hospital {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-green);
+      border: 1px solid var(--accent-green);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .header-title p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sound-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid var(--accent-blue);
+      color: #93c5fd;
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .sound-toggle-btn.muted {
+      background: rgba(100, 116, 139, 0.2);
+      border-color: #64748b;
+      color: #94a3b8;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 500;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 10px var(--accent-green);
+    }
+    .status-dot.offline {
+      background: var(--accent-red);
+      box-shadow: 0 0 10px var(--accent-red);
+    }
+
+    /* Live Emergency Warning Alert Box */
+    #criticalBanner {
+      display: none;
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.25), rgba(185, 28, 28, 0.35));
+      border: 2px solid var(--accent-red);
+      border-radius: 12px;
+      padding: 18px 22px;
+      margin-bottom: 20px;
+      align-items: center;
+      justify-content: space-between;
+      animation: emergencyPulse 1.5s infinite;
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.3);
+    }
+
+    @keyframes emergencyPulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+      70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .banner-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .alert-icon-box {
+      font-size: 36px;
+      animation: alertIconShake 0.6s infinite alternate;
+    }
+
+    @keyframes alertIconShake {
+      from { transform: scale(1); }
+      to { transform: scale(1.15); }
+    }
+
+    .banner-text h3 {
+      font-size: 16px;
+      color: #fee2e2;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .banner-patient {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #fef08a;
+      margin-top: 4px;
+    }
+
+    .banner-meta {
+      font-size: 12px;
+      color: #fed7aa;
+      margin-top: 2px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .banner-hazard {
+      font-size: 12.5px;
+      color: #fca5a5;
+      margin-top: 4px;
+      font-weight: 600;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .action-badge-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .action-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #fca5a5;
+      font-weight: 600;
+    }
+
+    .action-badge {
+      background: var(--accent-red);
+      color: white;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.3px;
+    }
+
+    /* Benchmark Metrics Banner */
+    .benchmark-bar {
+      background: linear-gradient(90deg, rgba(30, 41, 59, 0.8), rgba(17, 24, 39, 0.9));
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 10px;
+      padding: 12px 20px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      align-items: center;
+    }
+
+    .bench-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      padding-right: 10px;
+    }
+    .bench-item:last-child {
+      border-right: none;
+    }
+
+    .bench-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .bench-val {
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-cyan);
+    }
+
+    /* Live Hospital Patient & Bed Roster Cards */
+    .roster-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .roster-title {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .devices-summary-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .device-tile {
+      background: rgba(17, 24, 39, 0.7);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.3s;
+    }
+
+    .tile-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tile-bed {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tile-status {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .tile-status.under-attack {
+      background: rgba(239, 68, 68, 0.25);
+      color: #fca5a5;
+      border: 1px solid var(--accent-red);
+      animation: pulse-sm 1.5s infinite;
+    }
+
+    @keyframes pulse-sm {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+      70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .tile-patient {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .tile-diag {
+      font-size: 11px;
+      color: #94a3b8;
+      line-height: 1.3;
+    }
+
+    .tile-device {
+      font-size: 11px;
+      color: var(--accent-purple);
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tile-vital-stream {
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 6px;
+      padding: 6px 8px;
+      margin-top: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .vital-label {
+      font-size: 9.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .vital-val {
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+    .vital-val.danger {
+      color: var(--accent-red);
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0.5; }
+    }
+
+    /* Scope Boundary Callout */
+    .boundary-callout {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+      color: #bfdbfe;
+    }
+
+    .boundary-pill {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid var(--accent-blue);
+      color: #93c5fd;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* Summary Stats Cards */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .stat-title {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 26px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .stat-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Main Sections */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.65fr 1.35fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .card-title {
+      font-size: 14.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Forensic Proof Inspector Box */
+    .forensic-inspector {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 18px;
+    }
+
+    .forensic-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+
+    .forensic-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-purple);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .forensic-tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .tag-mitm {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid var(--accent-red);
+      color: #fca5a5;
+    }
+    .tag-ddos {
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid var(--accent-yellow);
+      color: #fde68a;
+    }
+    .tag-normal {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid var(--accent-green);
+      color: #a7f3d0;
+    }
+
+    .patient-highlight-box {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pat-info-left {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .pat-name-text {
+      font-size: 14px;
+      font-weight: 700;
+      color: #93c5fd;
+    }
+
+    .pat-diag-text {
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+
+    .pat-bed-badge {
+      background: rgba(59, 130, 246, 0.25);
+      border: 1px solid #3b82f6;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* Before vs After Vitals Comparison Table */
+    .vitals-compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 12px;
+      font-size: 11.5px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .vitals-compare-table th, .vitals-compare-table td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .vitals-compare-table th {
+      background: rgba(30, 41, 59, 0.6);
+      color: var(--text-muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .clinical-risk-box {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      border-radius: 6px;
+      padding: 9px 12px;
+      margin-bottom: 10px;
+      font-size: 11.5px;
+      color: #fca5a5;
+    }
+    .clinical-risk-box strong {
+      color: #ef4444;
+      text-transform: uppercase;
+      font-size: 10.5px;
+    }
+
+    .life-saving-box {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 6px;
+      padding: 9px 12px;
+      margin-bottom: 10px;
+      font-size: 11.5px;
+      color: #a7f3d0;
+    }
+    .life-saving-box strong {
+      color: var(--accent-green);
+      text-transform: uppercase;
+      font-size: 10.5px;
+    }
+
+    .forensic-justification {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #e2e8f0;
+    }
+    .forensic-justification strong {
+      color: var(--accent-cyan);
+    }
+
+    /* Simulation Control Buttons */
+    .controls-label {
+      font-size: 12px;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn {
+      padding: 11px 12px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 11.5px;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      text-align: center;
+    }
+
+    .btn-sub {
+      font-size: 9.5px;
+      opacity: 0.85;
+      font-weight: 400;
+    }
+
+    .btn-attack-infusion {
+      background: rgba(244, 63, 94, 0.15);
+      color: #fda4af;
+      border: 1px solid var(--accent-rose);
+    }
+    .btn-attack-infusion:hover {
+      background: var(--accent-rose);
+      color: white;
+    }
+
+    .btn-attack-ecg {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border: 1px solid var(--accent-red);
+    }
+    .btn-attack-ecg:hover {
+      background: var(--accent-red);
+      color: white;
+    }
+
+    .btn-attack-vent {
+      background: rgba(139, 92, 246, 0.15);
+      color: #d8b4fe;
+      border: 1px solid var(--accent-purple);
+    }
+    .btn-attack-vent:hover {
+      background: var(--accent-purple);
+      color: white;
+    }
+
+    .btn-attack-bedside {
+      background: rgba(249, 115, 22, 0.15);
+      color: #fdba74;
+      border: 1px solid var(--accent-orange);
+    }
+    .btn-attack-bedside:hover {
+      background: var(--accent-orange);
+      color: white;
+    }
+
+    .btn-ddos {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-yellow);
+      border: 1px solid var(--accent-yellow);
+    }
+    .btn-ddos:hover {
+      background: rgba(245, 158, 11, 0.25);
+    }
+
+    .btn-normal {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-green);
+      border: 1px solid var(--accent-green);
+    }
+    .btn-normal:hover {
+      background: rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-clear {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--card-border);
+    }
+    .btn-clear:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+
+    /* Alert List */
+    .alert-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 620px;
+      overflow-y: auto;
+    }
+
+    .alert-item {
+      background: rgba(255, 255, 255, 0.02);
+      border-left: 4px solid var(--accent-red);
+      border-top: 1px solid var(--card-border);
+      border-right: 1px solid var(--card-border);
+      border-bottom: 1px solid var(--card-border);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .alert-item.ddos-item {
+      border-left-color: var(--accent-yellow);
+    }
+
+    .alert-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .alert-patient-headline {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #93c5fd;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .alert-time {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .alert-patient-meta {
+      font-size: 11.5px;
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.1);
+      padding: 4px 8px;
+      border-radius: 4px;
+      border-left: 3px solid var(--accent-yellow);
+    }
+
+    .alert-device-row {
+      display: flex;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--accent-cyan);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .alert-msg {
+      font-size: 12px;
+      color: #e2e8f0;
+      font-weight: 500;
+    }
+
+    .alert-risk-badge {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      border-radius: 4px;
+      padding: 5px 8px;
+      font-size: 11px;
+      color: #fca5a5;
+    }
+
+    .alert-action-box {
+      margin-top: 4px;
+      padding: 6px 10px;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px dashed rgba(245, 158, 11, 0.4);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .alert-action-label {
+      font-size: 9.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .alert-action {
+      font-size: 11px;
+      color: var(--accent-yellow);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Live Emergency Warning Alert Box (Header Box) -->
+  <div id="criticalBanner">
+    <div class="banner-left">
+      <div class="alert-icon-box">🚨</div>
+      <div class="banner-text">
+        <h3 id="bannerTitle">CRITICAL MITM INTRUSION DETECTED</h3>
+        <div class="banner-patient" id="bannerPatient">Patient: Kamal Gunawardena (62y, Male) — Severe Diabetic Ketoacidosis</div>
+        <div class="banner-meta" id="bannerMeta">Target: Smart Infusion Pump | ICU Ward A — Bed #04 | IP: 192.168.10.45</div>
+        <div class="banner-hazard" id="bannerHazard">⚠️ CLINICAL HAZARD: Precipitous insulin surge inducing Acute Hypoglycemic Coma!</div>
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-title">
+      <h1>
+        IoMT Healthcare Anomaly &amp; MITM Attack Detection Dashboard
+        <span class="badge-scope">Component: Protocol Anomaly Detection</span>
+        <span class="badge-id">IT23368248</span>
+        <span class="badge-hospital">Hospital ICU Telemetry Zone</span>
+      </h1>
+      <p>Real-Time Patient Protection, Medical Device Telemetry Inspection &amp; Deterministic MITM Confirmation Engine</p>
+    </div>
+    <div class="header-controls">
+      <button class="sound-toggle-btn" id="soundToggleBtn" onclick="toggleAudioAlarm()">
+        <span id="soundIcon">🔊</span>
+        <span id="soundText">Alarm Audio: ON</span>
+      </button>
+      <div class="status-pill">
+        <div class="status-dot" id="backendDot"></div>
+        <span id="systemStatus">Checking Backend API...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Research Benchmark & Model Evaluation Bar -->
+  <div class="benchmark-bar">
+    <div class="bench-item">
+      <span class="bench-title">Stage 1 Classifier</span>
+      <span class="bench-val" style="color: #38bdf8;">99.99% Acc</span>
+    </div>
+    <div class="bench-item">
+      <span class="bench-title">Stage 3 MITM Anomaly</span>
+      <span class="bench-val" style="color: #4ade80;">99.54% Acc</span>
+    </div>
+    <div class="bench-item">
+      <span class="bench-title">MITM Precision</span>
+      <span class="bench-val" style="color: #f43f5e;">99.95%</span>
+    </div>
+    <div class="bench-item">
+      <span class="bench-title">Recall / Sensitivity</span>
+      <span class="bench-val" style="color: #a78bfa;">99.56%</span>
+    </div>
+    <div class="bench-item">
+      <span class="bench-title">False Positive Rate</span>
+      <span class="bench-val" style="color: #fbbf24;">0.0075%</span>
+    </div>
+    <div class="bench-item">
+      <span class="bench-title">Inference Latency</span>
+      <span class="bench-val" style="color: #2dd4bf;">0.004 ms</span>
+    </div>
+  </div>
+
+  <!-- Live Hospital ICU Patient & Bed Roster (With Live Vital Signs Telemetry Stream) -->
+  <div class="roster-header">
+    <span class="roster-title">🏥 Active ICU Patient Beds, Connected IoMT Devices &amp; Live Physiological Telemetry</span>
+    <span style="font-size: 11px; color: var(--accent-cyan);">Real-Time Bedside Vital Signs</span>
+  </div>
+  <div class="devices-summary-bar">
+    <!-- Bed 04: Kamal -->
+    <div class="device-tile" id="tile-infusion">
+      <div class="tile-top">
+        <span class="tile-bed">ICU WARD A — BED #04</span>
+        <span class="tile-status" id="badge-infusion">SECURE 🟢</span>
+      </div>
+      <span class="tile-patient">👤 Kamal Gunawardena (62y, M)</span>
+      <span class="tile-diag">Severe Diabetic Ketoacidosis</span>
+      <span class="tile-device">💉 Smart Infusion Pump (192.168.10.45)</span>
+      <div class="tile-vital-stream">
+        <span class="vital-label">Live Telemetry Rate &amp; Glucose:</span>
+        <span class="vital-val" id="vital-infusion">2.0 units/hr (Glucose: 180 mg/dL - Stable)</span>
+      </div>
+    </div>
+
+    <!-- Bed 02: Sunil -->
+    <div class="device-tile" id="tile-ecg">
+      <div class="tile-top">
+        <span class="tile-bed">CCU UNIT — BED #02</span>
+        <span class="tile-status" id="badge-ecg">SECURE 🟢</span>
+      </div>
+      <span class="tile-patient">👤 Sunil Weerasinghe (54y, M)</span>
+      <span class="tile-diag">Acute Myocardial Infarction</span>
+      <span class="tile-device">🫀 12-Lead ECG Monitor (192.168.10.22)</span>
+      <div class="tile-vital-stream">
+        <span class="vital-label">Live Cardiac Rhythm:</span>
+        <span class="vital-val" id="vital-ecg">78 bpm (Normal Sinus Rhythm - Stable)</span>
+      </div>
+    </div>
+
+    <!-- Bed 01: Nimali -->
+    <div class="device-tile" id="tile-vent">
+      <div class="tile-top">
+        <span class="tile-bed">ICU WARD B — BED #01</span>
+        <span class="tile-status" id="badge-vent">SECURE 🟢</span>
+      </div>
+      <span class="tile-patient">👤 Nimali Jayasuriya (48y, F)</span>
+      <span class="tile-diag">Acute Respiratory Distress (ARDS)</span>
+      <span class="tile-device">🫁 Smart Ventilator (192.168.10.18)</span>
+      <div class="tile-vital-stream">
+        <span class="vital-label">Ventilator PEEP &amp; SpO2:</span>
+        <span class="vital-val" id="vital-vent">16 bpm | PEEP: 10 cmH2O | SpO2: 96%</span>
+      </div>
+    </div>
+
+    <!-- Bed 12: Anura -->
+    <div class="device-tile" id="tile-bedside">
+      <div class="tile-top">
+        <span class="tile-bed">GENERAL WARD 3 — BED #12</span>
+        <span class="tile-status" id="badge-bedside">SECURE 🟢</span>
+      </div>
+      <span class="tile-patient">👤 Anura Perera (39y, M)</span>
+      <span class="tile-diag">Post-Op Abdominal Laparotomy</span>
+      <span class="tile-device">🩺 Bedside Monitor (192.168.10.33)</span>
+      <div class="tile-vital-stream">
+        <span class="vital-label">Live NIBP &amp; Physiological Vitals:</span>
+        <span class="vital-val" id="vital-bedside">BP: 120/80 mmHg | HR: 74 bpm | SpO2: 98%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scope Boundary Callout -->
+  <div class="boundary-callout">
+    <div>
+      <strong>Research Scope:</strong> Traffic Classification (Stage 1) ➔ Protocol Verification (Stage 2) ➔ Anomaly & MITM Alerting (Stage 3).
+    </div>
+    <div>
+      <span class="boundary-pill">Mitigation Enforcement: Handed over to Team Member 4 (SDN Controller)</span>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="dashboard-grid">
+    <div class="stat-card">
+      <div class="stat-title">Analyzed Flows</div>
+      <div class="stat-value" id="statFlows">0</div>
+      <div class="stat-subtitle">Ingested & inspected in real-time</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">IoMT Device Verification</div>
+      <div class="stat-value" style="color: var(--accent-blue);" id="statIoMT">100%</div>
+      <div class="stat-subtitle">Random Forest (Stage 1: 99.99% Acc)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">MITM Attacks Confirmed</div>
+      <div class="stat-value" style="color: var(--accent-red);" id="statMitm">0</div>
+      <div class="stat-subtitle">Targeted Healthcare Interceptions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">Inference Latency</div>
+      <div class="stat-value" style="color: var(--accent-green);" id="statLatency">0.004 ms</div>
+      <div class="stat-subtitle">Meets Real-time SDN Constraint (&lt;10 ms)</div>
+    </div>
+  </div>
+
+  <!-- Main Content Layout -->
+  <div class="main-grid">
+    <!-- Left Column -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Live MQTT Protocol Anomaly Metric Stream</div>
+        <span style="font-size: 11px; color: var(--text-muted);">Real-Time Anomaly Probability</span>
+      </div>
+      <canvas id="trafficChart" height="110"></canvas>
+
+      <!-- 🔬 Forensic Proof & Attack Evidence Inspector (Patient Context Included) -->
+      <div class="forensic-inspector">
+        <div class="forensic-head">
+          <div class="forensic-title">
+            <span>🔬 Live Patient &amp; IoMT Forensic Evidence Inspector</span>
+          </div>
+          <span class="forensic-tag tag-normal" id="inspectorTag">BASELINE SECURE</span>
+        </div>
+
+        <!-- Patient Highlight Banner -->
+        <div class="patient-highlight-box">
+          <div class="pat-info-left">
+            <span class="pat-name-text" id="inspectorPatName">👤 Anura Perera (39y, Male)</span>
+            <span class="pat-diag-text" id="inspectorPatDiag">Diagnosis: Post-Surgical Routine Recovery Observation</span>
+          </div>
+          <span class="pat-bed-badge" id="inspectorBed">BED #12 (GENERAL WARD 3)</span>
+        </div>
+
+        <!-- Before Attack vs Tampered In-Flight Telemetry Table -->
+        <table class="vitals-compare-table">
+          <thead>
+            <tr>
+              <th>Vital Parameter</th>
+              <th>Safe Clinical Baseline</th>
+              <th>Tampered In-Transit (MITM)</th>
+              <th>Immediate Patient Hazard</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="cmpParam" style="font-weight: 600; color: var(--text-main);">Multiparameter Stream</td>
+              <td id="cmpBaseline" style="color: var(--accent-green);">Compliant Baseline</td>
+              <td id="cmpTampered" style="color: var(--text-muted);">No Tampering Detected</td>
+              <td id="cmpHazard" style="color: #cbd5e1;">Normal Patient Status</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Clinical Hazard Alert -->
+        <div class="clinical-risk-box" id="inspectorRiskBox">
+          <strong>Clinical Morbidity Hazard:</strong> <span id="inspectorRisk">Compliant Physiological Sensor Stream — Zero Health Hazard.</span>
+        </div>
+
+        <!-- Life Saving Action -->
+        <div class="life-saving-box" id="lifeSavingBox">
+          <strong>🛡️ Clinical Intervention &amp; Protective Action:</strong> <span id="lifeSavingText">Traffic compliant. Continuous patient monitoring maintained.</span>
+        </div>
+
+        <div class="forensic-justification" id="inspectorReason">
+          <strong>Scientific Proof &amp; Discrimination:</strong> Flow matches regular physiological sensor heartbeat telemetry (ECG/SpO2/Infusion). Zero protocol anomalies or interception indicators detected.
+        </div>
+      </div>
+
+      <!-- Live Simulator Triggers (Healthcare Devices & Patients) -->
+      <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--card-border);">
+        <div class="controls-label">
+          <span>Healthcare Device Attack Injections (Simulate Targeted Patient Threat):</span>
+          <span style="font-size: 11px; color: var(--accent-cyan);">Click scenario to inject flow</span>
+        </div>
+        <div class="controls">
+          <button class="btn btn-attack-infusion" onclick="simulateInfusionTamper()">
+            <span>💉 Bed 04: Kamal (62y)</span>
+            <span class="btn-sub">Infusion Pump • L7 Tamper (Hypoglycemic Coma Risk)</span>
+          </button>
+          <button class="btn btn-attack-ecg" onclick="simulateEcgArpMitm()">
+            <span>🫀 Bed 02: Sunil (54y)</span>
+            <span class="btn-sub">ECG Monitor • L2 ARP MITM (Cardiogenic Shock Risk)</span>
+          </button>
+          <button class="btn btn-attack-vent" onclick="simulateVentilatorDns()">
+            <span>🫁 Bed 01: Nimali (48y)</span>
+            <span class="btn-sub">Ventilator • L3 DNS Spoof (Acute Hypoxemia Risk)</span>
+          </button>
+          <button class="btn btn-attack-bedside" onclick="simulateAnuraTamper()">
+            <span>🩺 Bed 12: Anura (39y)</span>
+            <span class="btn-sub">Bedside Monitor • L7/L2 Spoof (Hypovolemic Shock Risk)</span>
+          </button>
+          <button class="btn btn-ddos" onclick="simulateDDoS()">
+            <span>⚠️ Central Network Gateway</span>
+            <span class="btn-sub">Volumetric DDoS (Telemetry Queue Delay)</span>
+          </button>
+          <button class="btn btn-normal" onclick="simulateNormal()">
+            <span>🟢 Normal Baseline Telemetry</span>
+            <span class="btn-sub">All Ward Beds Compliant &amp; Secure</span>
+          </button>
+          <button class="btn btn-clear" onclick="clearAlerts()">
+            <span>🔄 Clear All Alerts</span>
+            <span class="btn-sub">Reset Patient Ward Baseline</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Real-Time Alerts Feed -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Real-Time Threat Alert Stream</div>
+        <span style="font-size: 11px; color: var(--text-muted);" id="alertCount">0 alerts</span>
+      </div>
+      <div class="alert-feed" id="alertFeed">
+        <div style="color: var(--text-muted); font-size: 12.5px; text-align: center; padding: 40px 0;">
+          No active threats detected. Hospital ICU telemetry baseline secure.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = (window.location.origin && window.location.origin.startsWith('http')) 
+      ? window.location.origin 
+      : "http://127.0.0.1:5000";
+
+    let totalFlows = 0;
+    let mitmCount = 0;
+    let soundEnabled = true;
+
+    // Toggle Audio Alarm
+    function toggleAudioAlarm() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('soundToggleBtn');
+      const icon = document.getElementById('soundIcon');
+      const text = document.getElementById('soundText');
+      if (soundEnabled) {
+        btn.className = 'sound-toggle-btn';
+        icon.innerText = '🔊';
+        text.innerText = 'Alarm Audio: ON';
+        playMedicalAlertBeep(); // test sound
+      } else {
+        btn.className = 'sound-toggle-btn muted';
+        icon.innerText = '🔇';
+        text.innerText = 'Alarm Audio: OFF';
+      }
+    }
+
+    // Serious Non-Rhythmic Continuous Medical Emergency Alert Beep (~3.5s steady alarm)
+    let activeAlarmCtx = null;
+
+    function playMedicalAlertBeep() {
+      if (!soundEnabled) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+
+        // Clean up any overlapping active audio context
+        if (activeAlarmCtx && activeAlarmCtx.state !== 'closed') {
+          try { activeAlarmCtx.close(); } catch (e) {}
+        }
+
+        const ctx = new AudioCtx();
+        activeAlarmCtx = ctx;
+
+        if (ctx.state === 'suspended') {
+          ctx.resume();
+        }
+
+        const now = ctx.currentTime;
+        const beepFreq = 1050;     // Standard clinical medical monitor warning pitch (constant, zero-rhythm)
+        const beepDuration = 0.13; // 130ms sharp hospital warning pulse
+        const beepInterval = 0.23; // Uniform steady interval (100ms silence between beeps)
+        const totalBeeps = 15;     // 15 steady, relentless urgent beeps = ~3.5 seconds duration
+
+        for (let i = 0; i < totalBeeps; i++) {
+          const t = now + (i * beepInterval);
+
+          // 1. Primary medical alert tone (Triangle wave for crisp, piercing hospital monitor beep)
+          const osc1 = ctx.createOscillator();
+          const gain1 = ctx.createGain();
+          osc1.type = 'triangle';
+          osc1.frequency.setValueAtTime(beepFreq, t);
+
+          gain1.gain.setValueAtTime(0.0001, t);
+          gain1.gain.linearRampToValueAtTime(0.42, t + 0.005);
+          gain1.gain.setValueAtTime(0.40, t + beepDuration - 0.015);
+          gain1.gain.exponentialRampToValueAtTime(0.0001, t + beepDuration);
+
+          // 2. High harmonic piezo overtone (Square wave bite for authoritative clinical warning presence)
+          const osc2 = ctx.createOscillator();
+          const gain2 = ctx.createGain();
+          osc2.type = 'square';
+          osc2.frequency.setValueAtTime(beepFreq * 2, t); // Octave overtone
+
+          gain2.gain.setValueAtTime(0.0001, t);
+          gain2.gain.linearRampToValueAtTime(0.10, t + 0.005);
+          gain2.gain.exponentialRampToValueAtTime(0.0001, t + beepDuration);
+
+          osc1.connect(gain1);
+          gain1.connect(ctx.destination);
+          osc2.connect(gain2);
+          gain2.connect(ctx.destination);
+
+          osc1.start(t);
+          osc1.stop(t + beepDuration + 0.01);
+          osc2.start(t);
+          osc2.stop(t + beepDuration + 0.01);
+        }
+      } catch (err) {
+        console.warn("Medical emergency alarm sound failed:", err);
+      }
+    }
+
+    // Setup Real-time Chart
+    const ctx = document.getElementById('trafficChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: Array(20).fill(''),
+        datasets: [{
+          label: 'Protocol Anomaly Score (0.0 = Benign, 1.0 = Critical Threat)',
+          data: Array(20).fill(0.04),
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          fill: true,
+          tension: 0.3,
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { min: 0, max: 1, grid: { color: '#1f293d' }, ticks: { color: '#9ca3af' } },
+          x: { grid: { display: false } }
+        },
+        plugins: { legend: { labels: { color: '#f3f4f6' } } }
+      }
+    });
+
+    function updateChart(score, isMitm, isDdos) {
+      const data = chart.data.datasets[0].data;
+      data.shift();
+      data.push(score);
+
+      if (isMitm) {
+        chart.data.datasets[0].borderColor = '#ef4444';
+        chart.data.datasets[0].backgroundColor = 'rgba(239, 68, 68, 0.2)';
+      } else if (isDdos) {
+        chart.data.datasets[0].borderColor = '#f59e0b';
+        chart.data.datasets[0].backgroundColor = 'rgba(245, 158, 11, 0.2)';
+      } else {
+        chart.data.datasets[0].borderColor = '#10b981';
+        chart.data.datasets[0].backgroundColor = 'rgba(16, 185, 129, 0.1)';
+      }
+      chart.update();
+    }
+
+    // Reset Patient Bed Tiles Status
+    function resetDeviceTiles() {
+      const bInf = document.getElementById('badge-infusion');
+      if (bInf) {
+        bInf.className = 'tile-status';
+        bInf.innerText = 'SECURE 🟢';
+        document.getElementById('vital-infusion').className = 'vital-val';
+        document.getElementById('vital-infusion').innerText = '2.0 units/hr (Glucose: 180 mg/dL - Stable)';
+      }
+
+      const bEcg = document.getElementById('badge-ecg');
+      if (bEcg) {
+        bEcg.className = 'tile-status';
+        bEcg.innerText = 'SECURE 🟢';
+        document.getElementById('vital-ecg').className = 'vital-val';
+        document.getElementById('vital-ecg').innerText = '78 bpm (Normal Sinus Rhythm - Stable)';
+      }
+
+      const bVent = document.getElementById('badge-vent');
+      if (bVent) {
+        bVent.className = 'tile-status';
+        bVent.innerText = 'SECURE 🟢';
+        document.getElementById('vital-vent').className = 'vital-val';
+        document.getElementById('vital-vent').innerText = '16 bpm | PEEP: 10 cmH2O | SpO2: 96%';
+      }
+
+      const bBed = document.getElementById('badge-bedside') || document.getElementById('badge-gateway');
+      if (bBed) {
+        bBed.className = 'tile-status';
+        bBed.innerText = 'SECURE 🟢';
+      }
+      const vBed = document.getElementById('vital-bedside') || document.getElementById('vital-gateway');
+      if (vBed) {
+        vBed.className = 'vital-val';
+        vBed.innerText = 'BP: 120/80 mmHg | HR: 74 bpm | SpO2: 98%';
+      }
+    }
+
+    function highlightDeviceTile(deviceName, isAttack) {
+      if (!isAttack) return;
+      if (deviceName.includes("Infusion")) {
+        const b = document.getElementById('badge-infusion');
+        b.className = 'tile-status under-attack';
+        b.innerText = '🚨 COMA RISK';
+        const v = document.getElementById('vital-infusion');
+        v.className = 'vital-val danger';
+        v.innerText = '⚠️ 25.0 units/hr (HYPOGLYCEMIC COMA - Glucose: 38 mg/dL)';
+      } else if (deviceName.includes("ECG")) {
+        const b = document.getElementById('badge-ecg');
+        b.className = 'tile-status under-attack';
+        b.innerText = '🚨 SHOCK RISK';
+        const v = document.getElementById('vital-ecg');
+        v.className = 'vital-val danger';
+        v.innerText = '⚠️ Spoofed 75 bpm (CARDIOGENIC SHOCK - BP: 60/40 mmHg)';
+      } else if (deviceName.includes("Ventilator")) {
+        const b = document.getElementById('badge-vent');
+        b.className = 'tile-status under-attack';
+        b.innerText = '🚨 HYPOXIA';
+        const v = document.getElementById('vital-vent');
+        v.className = 'vital-val danger';
+        v.innerText = '⚠️ PEEP: 0 cmH2O | SpO2: 68% (ACUTE ATELECTASIS)';
+      } else if (deviceName.includes("Bedside") || deviceName.includes("Anura") || deviceName.includes("BeneVision") || deviceName.includes("Multiparameter")) {
+        const b = document.getElementById('badge-bedside') || document.getElementById('badge-gateway');
+        if (b) {
+          b.className = 'tile-status under-attack';
+          b.innerText = '🚨 HYPOVOLEMIC SHOCK';
+        }
+        const v = document.getElementById('vital-bedside') || document.getElementById('vital-gateway');
+        if (v) {
+          v.className = 'vital-val danger';
+          v.innerText = '⚠️ Spoofed 120/80 (ACTUAL BP: 68/42 mmHg - Internal Bleeding)';
+        }
+      } else if (deviceName.includes("Gateway")) {
+        const b = document.getElementById('badge-bedside') || document.getElementById('badge-gateway');
+        if (b) {
+          b.className = 'tile-status under-attack';
+          b.innerText = '⚠️ QUEUE LAG';
+        }
+        const v = document.getElementById('vital-bedside') || document.getElementById('vital-gateway');
+        if (v) {
+          v.className = 'vital-val danger';
+          v.innerText = '⚠️ 150,000 pkts/sec (Nursing Station Alarm Lag: +14s)';
+        }
+      }
+    }
+
+    // Update Forensic Evidence Inspector
+    function updateForensicInspector(result) {
+      const tag  = document.getElementById('inspectorTag');
+      const pnam = document.getElementById('inspectorPatName');
+      const pdia = document.getElementById('inspectorPatDiag');
+      const pbed = document.getElementById('inspectorBed');
+      const rsk  = document.getElementById('inspectorRisk');
+      const rsn  = document.getElementById('inspectorReason');
+      const lsb  = document.getElementById('lifeSavingText');
+
+      const isMitm = result.anomaly_prediction === "MITM Attack Confirmed";
+      const isDdos = result.mitm_confirmation_status && result.mitm_confirmation_status.includes("Volumetric");
+
+      pnam.innerText = `👤 ${result.patient_name || 'Patient'} ${result.patient_age ? `(${result.patient_age}y, ${result.patient_gender})` : ''}`;
+      pdia.innerText = `Diagnosis: ${result.medical_diagnosis || 'Standard Observation'}`;
+      pbed.innerText = (result.hospital_location || 'ICU WARD').toUpperCase();
+
+      // Update Vitals Comparison Table
+      const bv = result.baseline_vitals || {};
+      const tv = result.tampered_vitals || {};
+      document.getElementById('cmpParam').innerText = bv.parameter || "Vital Stream";
+      document.getElementById('cmpBaseline').innerText = bv.normal_value || "Compliant Baseline";
+      document.getElementById('cmpTampered').innerText = tv.tampered_value || "Normal Telemetry";
+      document.getElementById('cmpHazard').innerText = tv.patient_condition || "Patient Stable";
+
+      rsk.innerText = tv.morbidity_mortality_hazard || result.clinical_risk || "Normal Physiological Telemetry";
+      lsb.innerText = result.life_saving_impact || "Standard baseline monitoring maintained.";
+
+      if (isMitm) {
+        tag.className = "forensic-tag tag-mitm";
+        tag.innerText = "🚨 CONFIRMED MITM";
+        rsn.innerHTML = `<strong>Scientific Proof &amp; Discrimination:</strong> ${result.forensic_proof || "Verified MITM attack coincident with statistical ML anomaly."}`;
+        highlightDeviceTile(result.target_device || "", true);
+        playMedicalAlertBeep();
+      } else if (isDdos) {
+        tag.className = "forensic-tag tag-ddos";
+        tag.innerText = "⚠️ VOLUMETRIC FLOOD (NON-MITM)";
+        rsn.innerHTML = `<strong>Scientific Proof &amp; Discrimination:</strong> ${result.forensic_proof || "High packet velocity flood without ARP/DNS spoofing flags. Differentiated from MITM attacks."}`;
+        highlightDeviceTile(result.target_device || "", true);
+        playMedicalAlertBeep();
+      } else {
+        tag.className = "forensic-tag tag-normal";
+        tag.innerText = "BASELINE SECURE";
+        rsn.innerHTML = `<strong>Scientific Proof &amp; Discrimination:</strong> ${result.forensic_proof || "Flow matches regular physiological telemetry (ECG/SpO2). Zero protocol tampering detected."}`;
+      }
+    }
+
+    // Check Backend API Health
+    async function checkBackendHealth() {
+      const dot = document.getElementById('backendDot');
+      const statusText = document.getElementById('systemStatus');
+      try {
+        const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(2000) });
+        if (res.ok) {
+          dot.className = "status-dot";
+          statusText.innerText = "Backend API: Online (Port 5000)";
+        } else {
+          dot.className = "status-dot offline";
+          statusText.innerText = "Backend API: Error";
+        }
+      } catch (e) {
+        dot.className = "status-dot offline";
+        statusText.innerText = "Backend API: Offline (Run python api/app.py)";
+      }
+    }
+
+    // Fetch Alerts Poll
+    async function fetchAlerts() {
+      try {
+        const res = await fetch(`${API_BASE}/alerts`);
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        const feed = document.getElementById('alertFeed');
+        document.getElementById('alertCount').innerText = `${data.total_alerts} alerts`;
+
+        if (data.alerts && data.alerts.length > 0) {
+          mitmCount = data.alerts.filter(a => a.status && a.status.includes("MITM")).length;
+          document.getElementById('statMitm').innerText = mitmCount;
+
+          feed.innerHTML = data.alerts.map(a => {
+            const isMitm = a.status && a.status.includes("MITM");
+            const alertTimeStr = new Date(a.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const tv = a.tampered_vitals || {};
+            return `
+              <div class="alert-item ${isMitm ? '' : 'ddos-item'}">
+                <div class="alert-top">
+                  <span class="alert-patient-headline">
+                    👤 ${a.patient_name || 'Patient'} ${a.patient_age ? `(${a.patient_age}y)` : ''}
+                  </span>
+                  <span class="alert-time">⏱️ ${alertTimeStr}</span>
+                </div>
+                <div class="alert-patient-meta">
+                  <strong>Diagnosis:</strong> ${a.medical_diagnosis || 'Intensive Care Monitoring'}
+                </div>
+                <div class="alert-device-row">
+                  <span>📍 ${a.hospital_location || 'ICU'}</span>
+                  <span>💉 ${a.target_device || 'Device'}</span>
+                  <span>🖧 IP: ${a.device_ip || 'N/A'}</span>
+                </div>
+                <div class="alert-msg" style="color: ${isMitm ? '#fca5a5' : '#fde68a'}; font-weight: 600;">
+                  ${a.message}
+                </div>
+                <div class="alert-risk-badge">
+                  <strong>⚠️ Immediate Clinical Hazard:</strong> ${tv.morbidity_mortality_hazard || a.clinical_risk || a.threat_type}
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          // Show Top Emergency Banner for latest alert
+          const latest = data.alerts[0];
+          const banner = document.getElementById('criticalBanner');
+          banner.style.display = 'flex';
+          document.getElementById('bannerTitle').innerText = `🚨 CRITICAL MITM INTRUSION DETECTED`;
+          document.getElementById('bannerPatient').innerText = `Target Patient: ${latest.patient_name || 'Patient'} ${latest.patient_age ? `(${latest.patient_age}y, ${latest.patient_gender})` : ''} — ${latest.medical_diagnosis || 'Critical Care'}`;
+          document.getElementById('bannerMeta').innerText = `Connected Device: ${latest.target_device} | ${latest.hospital_location} | IP: ${latest.device_ip} | Alerted at: ${new Date(latest.timestamp).toLocaleTimeString()}`;
+          const tvLatest = latest.tampered_vitals || {};
+          document.getElementById('bannerHazard').innerText = `⚠️ CLINICAL HAZARD: ${tvLatest.morbidity_mortality_hazard || latest.clinical_risk || 'Targeted protocol alteration in progress.'}`;
+        } else {
+          feed.innerHTML = `<div style="color: var(--text-muted); font-size: 12.5px; text-align: center; padding: 40px 0;">No active threats detected. Hospital ICU telemetry baseline secure.</div>`;
+          document.getElementById('criticalBanner').style.display = 'none';
+        }
+      } catch (err) {
+        console.error("Alert poll error:", err);
+      }
+    }
+
+    // Send Traffic Helper
+    async function sendTraffic(features) {
+      totalFlows++;
+      document.getElementById('statFlows').innerText = totalFlows;
+
+      try {
+        const res = await fetch(`${API_BASE}/predict`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ features })
+        });
+        const result = await res.json();
+        
+        const isMitm = result.anomaly_prediction === "MITM Attack Confirmed";
+        const isDdos = result.mitm_confirmation_status && result.mitm_confirmation_status.includes("Volumetric");
+        const score = result.anomaly_score || (isMitm ? 0.98 : (isDdos ? 0.85 : 0.04));
+
+        if (result.inference_latency_ms) {
+          document.getElementById('statLatency').innerText = `${result.inference_latency_ms.toFixed(3)} ms`;
+        }
+
+        updateChart(score, isMitm, isDdos);
+        updateForensicInspector(result);
+        fetchAlerts();
+      } catch (err) {
+        console.error("Traffic dispatch failed:", err);
+      }
+    }
+
+    // 1. Simulation: Bed 04 - Kamal Gunawardena (62y) Smart Infusion Pump L7 Payload Tampering
+    function simulateInfusionTamper() {
+      sendTraffic({
+        label: "mqtt_malformed_tampering",
+        patient_name: "Kamal Gunawardena",
+        patient_age: 62,
+        patient_gender: "Male",
+        medical_diagnosis: "Severe Diabetic Ketoacidosis & Post-Op Cardiac Surgery",
+        device_name: "Smart Infusion Pump (Alaris PK-04)",
+        device_ip: "192.168.10.45",
+        device_mac: "00:1A:2B:3C:4D:5E",
+        hospital_location: "ICU Ward A — Bed #04",
+        mqtt_topic: "hospital/icu/bed04/infusion_rate",
+        Header_Length: 68,
+        "Protocol Type": 6,
+        Duration: 0.35,
+        Rate: 32.0,
+        dst_port: 1883,
+        TCP: 1,
+        ARP: 0,
+        Variance: 4.85
+      });
+    }
+
+    // 2. Simulation: Bed 02 - Sunil Weerasinghe (54y) 12-Lead ECG Monitor L2 ARP Cache Poisoning
+    function simulateEcgArpMitm() {
+      sendTraffic({
+        label: "arp_poisoning_mitm",
+        patient_name: "Sunil Weerasinghe",
+        patient_age: 54,
+        patient_gender: "Male",
+        medical_diagnosis: "Acute Myocardial Infarction & Ventricular Arrhythmia",
+        device_name: "12-Lead ECG Cardiac Monitor (Philips IntelliVue)",
+        device_ip: "192.168.10.22",
+        device_mac: "70:B3:D5:49:11:8A",
+        hospital_location: "Cardiac Care Unit (CCU) — Bed #02",
+        mqtt_topic: "hospital/ccu/bed02/ecg_telemetry",
+        Header_Length: 54,
+        "Protocol Type": 6,
+        Duration: 0.12,
+        Rate: 45.0,
+        dst_port: 1883,
+        TCP: 1,
+        ARP: 1,
+        Variance: 0.15
+      });
+    }
+
+    // 3. Simulation: Bed 01 - Nimali Jayasuriya (48y) ICU Ventilator L3 DNS Spoofing
+    function simulateVentilatorDns() {
+      sendTraffic({
+        label: "dns_spoofing_mitm",
+        patient_name: "Nimali Jayasuriya",
+        patient_age: 48,
+        patient_gender: "Female",
+        medical_diagnosis: "Acute Respiratory Distress Syndrome (ARDS) on Mechanical Ventilation",
+        device_name: "ICU Smart Ventilator (Hamilton-C6)",
+        device_ip: "192.168.10.18",
+        device_mac: "00:50:56:A1:B2:C3",
+        hospital_location: "ICU Ward B — Bed #01 (Life Support)",
+        mqtt_topic: "hospital/icu/bed01/respiratory_telemetry",
+        Header_Length: 54,
+        "Protocol Type": 17,
+        Duration: 0.08,
+        Rate: 28.0,
+        dst_port: 1883,
+        DNS: 1,
+        ARP: 0,
+        Variance: 0.10
+      });
+    }
+
+    // 4. Simulation: ICU Central Telemetry Gateway Volumetric DDoS Flood (Non-MITM)
+    function simulateDDoS() {
+      sendTraffic({
+        label: "ddos_flood_anomaly",
+        patient_name: "ICU Multi-Patient Subnet",
+        patient_age: null,
+        patient_gender: "All Patients",
+        medical_diagnosis: "Central Bedside Telemetry Switch Subnet",
+        device_name: "ICU Central Gateway Switch (Cisco IE-4000)",
+        device_ip: "192.168.10.1",
+        device_mac: "00:00:0C:9F:F0:01",
+        hospital_location: "ICU Telemetry Aggregation Rack A",
+        mqtt_topic: "hospital/icu/+/telemetry_stream",
+        Header_Length: 54,
+        "Protocol Type": 6,
+        Duration: 0.05,
+        Rate: 150000.0,
+        dst_port: 1883,
+        TCP: 1,
+        ARP: 0,
+        Variance: 0.05
+      });
+    }
+
+    // 5. Simulation: Bed 12 - Anura Perera (39y) Bedside Monitor L7/L2 Telemetry Spoofing & Concealed Hemorrhage
+    function simulateAnuraTamper() {
+      sendTraffic({
+        label: "anura_bedside_tampering",
+        patient_name: "Anura Perera",
+        patient_age: 39,
+        patient_gender: "Male",
+        medical_diagnosis: "Post-Operative Abdominal Surgery Recovery",
+        device_name: "Multiparameter Bedside Monitor (Mindray BeneVision)",
+        device_ip: "192.168.10.33",
+        device_mac: "AC:DE:48:00:11:22",
+        hospital_location: "General Ward 3 — Bed #12",
+        mqtt_topic: "hospital/ward3/bed12/vitals",
+        Header_Length: 64,
+        "Protocol Type": 6,
+        Duration: 0.28,
+        Rate: 42.0,
+        dst_port: 1883,
+        TCP: 1,
+        ARP: 1,
+        Variance: 3.8
+      });
+    }
+
+    // 6. Simulation: All Beds Normal Baseline Telemetry Stream
+    function simulateNormal() {
+      resetDeviceTiles();
+      sendTraffic({
+        label: "benign_iomt_vitals",
+        patient_name: "All Ward Patients (Normal Baseline)",
+        patient_age: null,
+        patient_gender: "All",
+        medical_diagnosis: "Routine Post-Operative Ward Monitoring",
+        device_name: "Multiparameter Bedside Monitor (ECG/SpO2/NIBP)",
+        device_ip: "192.168.10.33",
+        device_mac: "AC:DE:48:00:11:22",
+        hospital_location: "General Ward 3 — Bed #12",
+        mqtt_topic: "hospital/ward3/bed12/vitals",
+        Header_Length: 138.2,
+        "Protocol Type": 7.1,
+        Duration: 83.1,
+        Rate: 39123.0,
+        TCP: 0.9,
+        UDP: 0.1,
+        IPv: 1.0,
+        "Tot size": 99.0,
+        "Tot sum": 616.5,
+        AVG: 130.1,
+        IAT: 169470300.0,
+        Weight: 38.5,
+        dst_port: 1883,
+        ARP: 0,
+        DNS: 0,
+        Variance: 0.02
+      });
+    }
+
+    // Clear Alerts
+    async function clearAlerts() {
+      await fetch(`${API_BASE}/alerts/clear`, { method: 'POST' });
+      document.getElementById('criticalBanner').style.display = 'none';
+      document.getElementById('statMitm').innerText = '0';
+      resetDeviceTiles();
+      fetchAlerts();
+    }
+
+    // Periodic Polling
+    fetchAlerts();
+    checkBackendHealth();
+    setInterval(fetchAlerts, 2000);
+    setInterval(checkBackendHealth, 4000);
+  </script>
+</body>
+</html>
