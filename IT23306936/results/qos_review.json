@@ -1,0 +1,17 @@
+{
+  "measurement_file": "concurrent_sensor_udp.json",
+  "sensor_metrics": {
+    "receiver_kbps": 100.427,
+    "packet_loss_percent": 0,
+    "jitter_ms": 0.126
+  },
+  "qos_review": {
+    "decision": "no_change_recommended",
+    "reasons": [],
+    "thresholds": {
+      "min_throughput_kbps": 90,
+      "max_loss_percent": 1
+    }
+  },
+  "mode": "offline_review"
+}
