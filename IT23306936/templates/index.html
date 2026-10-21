@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoMT Security Observatory — Adaptive Mitigation & Medical Network Monitoring</title>
+    <!-- Modern Typography: Inter, Outfit, JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <!-- Three.js for 3D topology -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body class="observatory-layout">
+
+    <!-- Left Navigation Sidebar -->
+    <aside class="sidebar-nav" id="sidebar">
+        <!-- Logo & Branding -->
+        <div class="sidebar-brand">
+            <div class="brand-crest">
+                <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="crest-svg">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="M12 8v8"/>
+                    <path d="M8 12h8"/>
+                </svg>
+            </div>
+            <div class="brand-text">
+                <span class="brand-title">IoMT</span>
+                <span class="brand-subtitle">Security Observatory</span>
+            </div>
+        </div>
+
+        <!-- Sidebar Navigation Menu -->
+        <nav class="sidebar-menu">
+            <a href="#section-overview" class="nav-item active" id="nav-overview" onclick="activateNav(this, 'section-overview')">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span>Overview</span>
+            </a>
+            <a href="#section-network" class="nav-item" id="nav-network" onclick="activateNav(this, 'section-network')">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="2" width="6" height="6" rx="1"/>
+                    <rect x="16" y="2" width="6" height="6" rx="1"/>
+                    <rect x="9" y="16" width="6" height="6" rx="1"/>
+                    <path d="M5 8v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"/>
+                    <line x1="12" y1="13" x2="12" y2="16"/>
+                </svg>
+                <span>Network</span>
+            </a>
+            <a href="#section-alerts" class="nav-item" id="nav-alerts" onclick="activateNav(this, 'section-alerts')">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span>Alerts</span>
+            </a>
+            <a href="#section-experiments" class="nav-item" id="nav-experiments" onclick="activateNav(this, 'section-experiments')">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 2v7.31L4.69 16.5A2 2 0 0 0 6.36 19.5h11.28a2 2 0 0 0 1.67-3L14 9.31V2"/>
+                    <line x1="8" y1="2" x2="16" y2="2"/>
+                </svg>
+                <span>Experiments</span>
+            </a>
+            <a href="#section-results" class="nav-item" id="nav-results" onclick="activateNav(this, 'section-results')">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                <span>Results</span>
+            </a>
+            <a href="#section-settings" class="nav-item" id="nav-settings" onclick="activateNav(this, 'section-settings')">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+            <div class="sidebar-meta">
+                <span class="meta-label">Student:</span>
+                <span class="meta-val">IT23306936</span>
+            </div>
+            <div class="sidebar-meta">
+                <span class="meta-label">Project:</span>
+                <span class="meta-val">J26-CS-330</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Application Area -->
+    <div class="main-content">
+
+        <!-- Top Header & Mode Bar -->
+        <header class="observatory-header">
+            <div class="header-titles">
+                <div class="title-row">
+                    <h1 class="main-title">IoMT Security Observatory</h1>
+                    <!-- Mode/Provenance Pill Badge -->
+                    <span class="mode-provenance-badge badge-demo" id="header-mode-badge">DEMO &bull; Synthetic data</span>
+                </div>
+                <p class="main-subtitle">Adaptive mitigation &amp; medical network monitoring</p>
+            </div>
+
+            <!-- Top Right: Mode Switcher & Utilities -->
+            <div class="header-actions">
+                <div class="mode-segmented-control" id="mode-switcher">
+                    <button class="segmented-btn" id="btn-mode-live" onclick="switchMode('LIVE')">LIVE</button>
+                    <button class="segmented-btn" id="btn-mode-replay" onclick="switchMode('REPLAY')">REPLAY</button>
+                    <button class="segmented-btn active" id="btn-mode-demo" onclick="switchMode('DEMO')">DEMO</button>
+                </div>
+
+                <div class="connection-status-pill" id="connection-pill">
+                    <span class="status-indicator-dot" id="conn-dot"></span>
+                    <span id="conn-label">Connected (DEMO)</span>
+                </div>
+
+                <div class="clock-display" id="sys-clock">--:--:-- UTC</div>
+            </div>
+        </header>
+
+        <!-- Dynamic Controls Bar (Replay & Testbed Controls) -->
+        <section class="controls-drawer glass-card" id="controls-section">
+            <div class="controls-row-left" id="live-controls-group">
+                <span class="drawer-title">Testbed Runner:</span>
+                <select id="scenario-selector" class="custom-select">
+                    <option value="adaptive">Adaptive Mitigation (1000 &rarr; 500 kbps)</option>
+                    <option value="static_block">Static Blocking Baseline (Drop Rule)</option>
+                    <option value="baseline">Unmitigated Baseline (5 Mbit/s DoS vs 100 kbps ECG)</option>
+                    <option value="smoke_1_repeat">1-Repeat Smoke Evaluation (All Scenarios)</option>
+                </select>
+                <button id="btn-start-experiment" class="btn btn-primary" onclick="startExperiment()">
+                    <span>&blacktriangleright;</span> Start Experiment
+                </button>
+                <button id="btn-stop-experiment" class="btn btn-danger" onclick="stopExperiment()">
+                    <span>&#9632;</span> Stop
+                </button>
+                <span id="experiment-status-text" class="status-text">Status: Idle</span>
+            </div>
+
+            <!-- Sequential Replay Controls (Issue D) -->
+            <div class="controls-row-right" id="replay-controls" style="display: none;">
+                <span class="drawer-title">Replay Run:</span>
+                <select id="replay-selector" class="custom-select" onchange="loadSelectedReplay(this.value)">
+                    <option value="">-- Select Recorded Benchmark or Run --</option>
+                </select>
+                <div class="replay-btn-group">
+                    <button class="btn btn-secondary btn-sm" id="btn-replay-prev" onclick="stepReplay('prev')" title="Previous Window">&#9664; Prev</button>
+                    <button class="btn btn-primary btn-sm" id="btn-replay-play" onclick="toggleReplayPlay()" title="Auto Play / Pause">&#9654; Play</button>
+                    <button class="btn btn-secondary btn-sm" id="btn-replay-next" onclick="stepReplay('next')" title="Next Window">Next &#9654;</button>
+                    <button class="btn btn-secondary btn-sm" id="btn-replay-restart" onclick="stepReplay('restart')" title="Restart to Window 1">&#8634; Restart</button>
+                    <select id="replay-speed" class="custom-select custom-select-sm" onchange="setReplaySpeed(this.value)">
+                        <option value="2.0">0.5x Speed</option>
+                        <option value="1.0" selected>1.0x Speed</option>
+                        <option value="0.5">2.0x Speed</option>
+                    </select>
+                </div>
+                <span id="replay-progress-text" class="status-indicator text-cyan">Window: -- / --</span>
+            </div>
+        </section>
+
+        <!-- TOP METRICS CARDS ROW (4 Cards - Matches mockup) -->
+        <section class="metrics-cards-grid" id="section-overview">
+            
+            <!-- Card 1: Sensor Throughput -->
+            <div class="observatory-card metric-card" id="kpi-throughput-card">
+                <div class="metric-icon-circle icon-blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="svg-icon">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                    </svg>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-label">Sensor throughput</span>
+                    <div class="metric-value-row">
+                        <span class="metric-value" id="kpi-tp-val">99.9</span>
+                        <span class="metric-unit">Kbit/s</span>
+                    </div>
+                    <div class="metric-delta delta-positive" id="kpi-tp-badge">
+                        <span class="delta-arrow">&blacktriangle;</span> +2.1% vs. baseline
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: UDP Packet Loss -->
+            <div class="observatory-card metric-card" id="kpi-loss-card">
+                <div class="metric-icon-circle icon-blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="svg-icon">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="9" y1="15" x2="15" y2="15"/>
+                    </svg>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-label">UDP packet loss</span>
+                    <div class="metric-value-row">
+                        <span class="metric-value" id="kpi-loss-val">0.3</span>
+                        <span class="metric-unit">%</span>
+                    </div>
+                    <div class="metric-delta delta-positive" id="kpi-loss-badge">
+                        <span class="delta-arrow">&blacktriangledown;</span> -0.9% vs. before mitigation
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: ICMP RTT -->
+            <div class="observatory-card metric-card" id="kpi-rtt-card">
+                <div class="metric-icon-circle icon-blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="svg-icon">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-label">ICMP RTT</span>
+                    <div class="metric-value-row">
+                        <span class="metric-value" id="kpi-rtt-val">2.4</span>
+                        <span class="metric-unit">ms</span>
+                    </div>
+                    <div class="metric-delta delta-neutral" id="kpi-rtt-badge">
+                        <span class="delta-arrow">&blacktriangledown;</span> -0.6 ms vs. before mitigation
+                    </div>
+                    <div class="metric-footnote" title="Echo reply arrival round-trip time; not UDP one-way delay">
+                        <span class="info-icon">&#9432;</span> ICMP RTT &ne; one-way delay
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Mitigation State -->
+            <div class="observatory-card metric-card" id="kpi-mitigation-card">
+                <div class="metric-icon-circle icon-teal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="svg-icon">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <polyline points="9 12 11 14 15 10"/>
+                    </svg>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-label">Mitigation</span>
+                    <div class="metric-value-row">
+                        <span class="metric-value text-teal" id="kpi-meter-val">Rate limited &bull; 1000 Kbit/s</span>
+                        <span class="metric-unit" id="kpi-meter-unit"></span>
+                    </div>
+                    <div class="metric-subtext" id="kpi-lifecycle-val">
+                        Adaptive rule active
+                    </div>
+                    <div class="metric-subdetail mono" id="kpi-scope-val">
+                        Flow: h3 &rarr; h2:5201 (UDP)
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- MIDDLE SECTION (Hospital Network View + Incident Activity) -->
+        <section class="middle-split-grid" id="section-network">
+            
+            <!-- Middle Left: Hospital network illustrative view -->
+            <div class="observatory-card hospital-network-card">
+                <div class="card-top-bar">
+                    <div class="card-heading">
+                        <svg class="heading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <path d="M12 8v8"/>
+                            <path d="M8 12h8"/>
+                        </svg>
+                        <span class="heading-title">Hospital network &bull; Illustrative view</span>
+                    </div>
+                    <div class="heading-actions">
+                        <span class="architecture-pill">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                            Direct OVS architecture
+                        </span>
+                        <div class="view-switcher-tabs">
+                            <button class="view-tab-btn active" id="tab-view-illustrative" onclick="switchTopologyDisplay('illustrative')">Illustrative View</button>
+                            <button class="view-tab-btn" id="tab-view-3d" onclick="switchTopologyDisplay('3D')">3D Ward</button>
+                            <button class="view-tab-btn" id="tab-view-2d" onclick="switchTopologyDisplay('2D')">2D Schematic</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="network-display-area" id="topology-viewport">
+                    <!-- 1. Illustrative Isometric View (Matches mockup) -->
+                    <div class="view-panel active" id="panel-illustrative">
+                        <img src="/static/img/hospital_network_illustrative.png" alt="Hospital Network Illustrative View" class="illustrative-img" id="illustrative-image">
+                        <div class="illustrative-caption">
+                            <span>Clinical Zone (h1 Sensor &rarr; h2 Edge Server) &bull; Outside Zone (h3 Attacker &rarr; s1 OVS Switch)</span>
+                            <span class="architecture-footnote">Enforced via Direct OpenFlow 1.3 meters &bull; Ryu daemon inactive</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. Interactive Three.js 3D Canvas -->
+                    <div class="view-panel" id="panel-3d" style="display: none;">
+                        <div id="threejs-canvas-wrapper" style="width: 100%; height: 280px;"></div>
+                    </div>
+
+                    <!-- 3. High-Contrast 2D Schematic Canvas Fallback -->
+                    <div class="view-panel" id="panel-2d" style="display: none;">
+                        <canvas id="canvas-2d-topology" style="width: 100%; height: 280px;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Right: Incident Activity Stepper -->
+            <div class="observatory-card incident-activity-card" id="section-alerts">
+                <div class="card-top-bar">
+                    <div class="card-heading">
+                        <svg class="heading-icon icon-cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        </svg>
+                        <div>
+                            <span class="heading-title">Incident activity</span>
+                            <span class="heading-sub">Live timeline (latest first)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vertical Incident Stepper (Matches mockup) -->
+                <div class="incident-timeline-list" id="incident-stepper-list">
+                    
+                    <!-- Item 1: Alert received -->
+                    <div class="incident-item">
+                        <div class="incident-icon-col">
+                            <div class="incident-node-icon icon-red">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            </div>
+                            <div class="incident-line"></div>
+                        </div>
+                        <div class="incident-details">
+                            <div class="incident-header-row">
+                                <span class="incident-title">Alert received</span>
+                                <span class="incident-time" id="inc-time-1">10:14:32</span>
+                            </div>
+                            <p class="incident-desc">Abnormal UDP traffic detected (exceeding threshold)</p>
+                        </div>
+                    </div>
+
+                    <!-- Item 2: Service context checked -->
+                    <div class="incident-item">
+                        <div class="incident-icon-col">
+                            <div class="incident-node-icon icon-blue">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            </div>
+                            <div class="incident-line"></div>
+                        </div>
+                        <div class="incident-details">
+                            <div class="incident-header-row">
+                                <span class="incident-title">Service context checked</span>
+                                <span class="incident-time" id="inc-time-2">10:14:34</span>
+                            </div>
+                            <p class="incident-desc">Identified as non-clinical UDP traffic to h1 (medical sensor)</p>
+                        </div>
+                    </div>
+
+                    <!-- Item 3: Load flow limited -->
+                    <div class="incident-item">
+                        <div class="incident-icon-col">
+                            <div class="incident-node-icon icon-teal">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                            </div>
+                            <div class="incident-line"></div>
+                        </div>
+                        <div class="incident-details">
+                            <div class="incident-header-row">
+                                <span class="incident-title">Load flow limited</span>
+                                <span class="incident-time" id="inc-time-3">10:14:37</span>
+                            </div>
+                            <p class="incident-desc">Applied rate limit 1000 Kbit/s on suspected flow (s1)</p>
+                        </div>
+                    </div>
+
+                    <!-- Item 4: QoS recovering -->
+                    <div class="incident-item">
+                        <div class="incident-icon-col">
+                            <div class="incident-node-icon icon-green">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                        </div>
+                        <div class="incident-details">
+                            <div class="incident-header-row">
+                                <span class="incident-title">QoS recovering</span>
+                                <span class="incident-time" id="inc-time-4">10:15:10</span>
+                            </div>
+                            <p class="incident-desc">Sensor throughput stable, UDP packet loss decreasing</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+        <!-- BOTTOM ROW (Sensor Throughput Chart + UDP Loss Chart + Experiment Comparison Table) -->
+        <section class="bottom-split-grid" id="section-results">
+            
+            <!-- Bottom Left: Sensor throughput (h1) Chart Card -->
+            <div class="observatory-card chart-card">
+                <div class="card-top-bar">
+                    <div class="card-heading">
+                        <svg class="heading-icon icon-teal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        </svg>
+                        <span class="heading-title">Sensor throughput (h1)</span>
+                    </div>
+                </div>
+                <div class="chart-container-box">
+                    <div class="chart-y-axis-label">Throughput (Kbit/s)</div>
+                    <canvas id="chart-throughput" height="150"></canvas>
+                    <div class="chart-legend-footer">
+                        <div class="legend-badge"><span class="legend-line line-teal"></span> Sensor throughput (h1)</div>
+                        <div class="legend-badge"><span class="legend-line line-dashed-green"></span> Threshold (90 Kbit/s)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Middle: UDP packet loss (h1) Chart Card -->
+            <div class="observatory-card chart-card">
+                <div class="card-top-bar">
+                    <div class="card-heading">
+                        <svg class="heading-icon icon-coral" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        <span class="heading-title">UDP packet loss (h1)</span>
+                    </div>
+                </div>
+                <div class="chart-container-box">
+                    <div class="chart-y-axis-label">Packet loss (%)</div>
+                    <canvas id="chart-loss" height="150"></canvas>
+                    <div class="chart-legend-footer">
+                        <div class="legend-badge"><span class="legend-line line-coral"></span> UDP packet loss (h1)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Right: Experiment comparison Table Card -->
+            <div class="observatory-card comparison-table-card">
+                <div class="card-top-bar">
+                    <div class="card-heading">
+                        <svg class="heading-icon icon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                        <span class="heading-title">Experiment comparison</span>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="observatory-table" id="mockup-comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th class="text-right">Avg. throughput<br><span class="col-unit">(Kbit/s)</span></th>
+                                <th class="text-right">UDP packet loss<br><span class="col-unit">(%)</span></th>
+                                <th class="text-right">ICMP RTT<br><span class="col-unit">(ms)</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="method-cell">Baseline<br><span class="method-sub">(no attack)</span></td>
+                                <td class="text-right font-mono" id="comp-base-tp">99.7</td>
+                                <td class="text-right font-mono" id="comp-base-loss">0.3</td>
+                                <td class="text-right font-mono" id="comp-base-rtt">2.3</td>
+                            </tr>
+                            <tr>
+                                <td class="method-cell">Static mitigation<br><span class="method-sub">(fixed rule)</span></td>
+                                <td class="text-right font-mono" id="comp-stat-tp">92.1</td>
+                                <td class="text-right font-mono" id="comp-stat-loss">2.8</td>
+                                <td class="text-right font-mono" id="comp-stat-rtt">3.9</td>
+                            </tr>
+                            <tr class="highlighted-row">
+                                <td class="method-cell font-semibold">Adaptive mitigation<br><span class="method-sub text-teal">(our approach)</span></td>
+                                <td class="text-right font-mono font-semibold text-teal" id="comp-adap-tp">99.6</td>
+                                <td class="text-right font-mono font-semibold text-teal" id="comp-adap-loss">0.4</td>
+                                <td class="text-right font-mono font-semibold text-teal" id="comp-adap-rtt">2.4</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-caption-footnote">
+                    Design concept &mdash; illustrative measurements
+                </div>
+            </div>
+
+        </section>
+
+        <!-- DETAILED BENCHMARK & REPLAY DATA TABLES (Preserves full empirical results & exports) -->
+        <section class="detailed-results-section" id="section-experiments">
+            
+            <!-- Empirical Statistics Table -->
+            <div class="observatory-card">
+                <div class="card-top-bar">
+                    <div class="card-heading">
+                        <span class="heading-title">Empirical Benchmark Summary Across Evaluated Scenarios</span>
+                    </div>
+                    <div class="export-actions">
+                        <a href="/api/export/csv" class="btn btn-secondary btn-sm" id="btn-export-csv">Export CSV</a>
+                        <a href="/api/export/json" class="btn btn-secondary btn-sm" id="btn-export-json">Export JSON</a>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="observatory-table" id="statistics-table">
+                        <thead>
+                            <tr>
+                                <th>Scenario</th>
+                                <th>Valid Runs</th>
+                                <th>Execution Failures</th>
+                                <th>Invalid</th>
+                                <th>QoS Pass Rate</th>
+                                <th>Throughput Mean &plusmn; SD</th>
+                                <th>Loss Mean &plusmn; SD</th>
+                                <th>ICMP RTT Mean &plusmn; SD</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statistics-table-body">
+                            <tr>
+                                <td class="font-semibold">Baseline (Unmitigated)</td>
+                                <td id="stat-base-valid">--</td>
+                                <td id="stat-base-fails">--</td>
+                                <td id="stat-base-inv">--</td>
+                                <td id="stat-base-pass" class="text-red font-semibold">0.0%</td>
+                                <td id="stat-base-tp">--</td>
+                                <td id="stat-base-loss">--</td>
+                                <td id="stat-base-rtt">--</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">Static Blocking</td>
+                                <td id="stat-stat-valid">--</td>
+                                <td id="stat-stat-fails">--</td>
+                                <td id="stat-stat-inv">--</td>
+                                <td id="stat-stat-pass">--</td>
+                                <td id="stat-stat-tp">--</td>
+                                <td id="stat-stat-loss">--</td>
+                                <td id="stat-stat-rtt">--</td>
+                            </tr>
+                            <tr class="highlighted-row">
+                                <td class="font-semibold text-teal">Adaptive Mitigation</td>
+                                <td id="stat-adap-valid">--</td>
+                                <td id="stat-adap-fails">--</td>
+                                <td id="stat-adap-inv">--</td>
+                                <td id="stat-adap-pass" class="text-teal font-semibold">--</td>
+                                <td id="stat-adap-tp">--</td>
+                                <td id="stat-adap-loss">--</td>
+                                <td id="stat-adap-rtt">--</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Historical Benchmark Logs -->
+            <div class="observatory-card" style="margin-top: 20px;">
+                <div class="card-top-bar">
+                    <div class="card-heading">
+                        <span class="heading-title">Raw Benchmark Run History</span>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="refreshHistory()">&#x21bb; Refresh History</button>
+                </div>
+                <div class="table-container">
+                    <table class="observatory-table" id="history-table">
+                        <thead>
+                            <tr>
+                                <th>Benchmark ID</th>
+                                <th>Timestamp</th>
+                                <th>Mode</th>
+                                <th>Type</th>
+                                <th>Repeats</th>
+                                <th>Valid Runs</th>
+                                <th>Execution Failures</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">Scanning benchmark results...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Ingested Alert Inspector & Policy Details -->
+            <div class="observatory-card" style="margin-top: 20px;" id="section-settings">
+                <div class="card-top-bar">
+                    <div class="card-heading">
+                        <span class="heading-title">Security Alert Contract &amp; Safety Policy Details</span>
+                    </div>
+                </div>
+                <div class="alert-details-grid">
+                    <div class="alert-meta-box">
+                        <div class="meta-row"><span>Alert ID:</span> <span class="mono" id="alert-id-val">ALT-202610-001</span></div>
+                        <div class="meta-row"><span>Source IP:</span> <span class="mono text-red" id="alert-src-val">10.0.0.3</span></div>
+                        <div class="meta-row"><span>Target IP:</span> <span class="mono" id="alert-dst-val">10.0.0.2</span></div>
+                        <div class="meta-row"><span>Target Port:</span> <span class="mono" id="alert-port-val">UDP 5201</span></div>
+                        <div class="meta-row"><span>Critical Service:</span> <span class="text-teal font-semibold" id="alert-service-val">ECG_Monitoring (h1:5202)</span></div>
+                        <div class="meta-row"><span>Detector Status:</span> <span class="text-muted" id="alert-detector-status">External REST Ingestion</span></div>
+                    </div>
+                    <div class="policy-explanation-box">
+                        <span class="font-semibold">Safety-Constrained Policy Decision:</span>
+                        <p class="policy-desc" id="policy-reasoning-text">
+                            Detected DoS attack targeting Hospital Edge Server. Service criticality manager identified concurrent critical ECG monitoring service (10.0.0.1:5202). Blanket port blocking rejected to prevent accidental disruption. Applying scoped OpenFlow meter rate-limiting (1000 Kbit/s) with 300s timeout and dynamic post-mitigation reassessment.
+                        </p>
+                        <div class="enforcement-badge">
+                            <span id="enforcement-status-val">Enforced via Direct OVS OpenFlow 1.3 (OVSEnforcer)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Footer -->
+        <footer class="observatory-footer">
+            <div class="footer-left">
+                <span>SLIIT Faculty of Computing &bull; Department of Information Technology &bull; J26-CS-330</span>
+            </div>
+            <div class="footer-right">
+                <span>Safety-Constrained Adaptive SDN Mitigation and Monitoring &bull; IT23306936</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Application Controller Scripts -->
+    <script src="/static/js/dashboard.js"></script>
+    <script src="/static/js/topology_3d.js"></script>
+    <script>
+        function activateNav(el, sectionId) {
+            document.querySelectorAll('.sidebar-menu .nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            const target = document.getElementById(sectionId);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function switchTopologyDisplay(viewType) {
+            document.querySelectorAll('.view-tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.view-panel').forEach(p => p.style.display = 'none');
+
+            if (viewType === 'illustrative') {
+                document.getElementById('tab-view-illustrative').classList.add('active');
+                document.getElementById('panel-illustrative').style.display = 'block';
+            } else if (viewType === '3D') {
+                document.getElementById('tab-view-3d').classList.add('active');
+                document.getElementById('panel-3d').style.display = 'block';
+                if (window.setTopologyView) window.setTopologyView('3D');
+            } else if (viewType === '2D') {
+                document.getElementById('tab-view-2d').classList.add('active');
+                document.getElementById('panel-2d').style.display = 'block';
+                if (window.setTopologyView) window.setTopologyView('2D');
+            }
+        }
+    </script>
+</body>
+</html>
