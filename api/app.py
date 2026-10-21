@@ -25,6 +25,7 @@ from pathlib import Path
 import joblib
 import numpy as np
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 logging.basicConfig(
     level=logging.INFO,
@@ -37,6 +38,7 @@ BASE    = Path(__file__).resolve().parent.parent
 MDL_DIR = BASE / "models"
 
 app = Flask(__name__)
+CORS(app)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # LOAD MODELS AT STARTUP
