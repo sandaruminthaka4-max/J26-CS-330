@@ -82,6 +82,19 @@
 
 ---
 
+### Entry 7 — Threat Visualization Dashboard & Scope Alignment
+* **Date:** 2026-10-21
+* **Tasks Completed:**
+  - Implemented standalone interactive frontend dashboard (`dashboard/index.html`) using HTML5, CSS3, and Chart.js.
+  - Enabled Cross-Origin Resource Sharing (`flask-cors`) on Flask REST API to allow browser telemetry polling.
+  - Formulated clear component scope boundary: explicitly delineating detection/alerting responsibilities from Team Member 4's SDN enforcement/mitigation duties.
+  - Incorporated a protocol discrimination matrix illustrating differentiation between MITM (ARP conflict) and volumetric floods (DDoS).
+  - Built real-time interactive traffic injectors for MITM (ARP Poisoning), Volumetric Flood, and Normal Patient Telemetry.
+* **Key Decisions / Technical Notes:**
+  - Standardized terminology across UI: replaced "Mitigated by Ryu" with "Action Dispatched to SDN Layer" to maintain strict fidelity to the individual research scope.
+
+---
+
 ### Summary of Completed Milestones
 | Milestone | Status | Key Deliverable |
 |---|:---:|---|
@@ -91,3 +104,4 @@
 | Stage 3 Anomaly Detector | Completed | `03_anomaly_detector.py`, `anomaly_detector.joblib`, 99.54% Acc |
 | Integrated REST API | Completed | `api/app.py`, endpoints (`/predict`, `/health`, `/schema`) |
 | MITM Correlation & Alerting | Completed | Stage 3.5 engine, `/alerts` feed, 100% verified alerts |
+| Threat Alert Dashboard | Completed | `dashboard/index.html`, scope alignment, live injectors |
