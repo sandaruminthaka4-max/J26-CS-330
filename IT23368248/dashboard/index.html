@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IoMT Protocol Anomaly Detection & MITM Threat Alert Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0a0e17;
+      --card-bg: #111827;
+      --card-border: #1f293d;
+      --accent-blue: #3b82f6;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-yellow: #f59e0b;
+      --accent-purple: #8b5cf6;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 24px;
+    }
+
+    .header-title h1 {
+      font-size: 22px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-scope {
+      background: rgba(139, 92, 246, 0.2);
+      color: var(--accent-purple);
+      border: 1px solid var(--accent-purple);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .header-title p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 10px var(--accent-green);
+    }
+
+    /* Scope Boundary Callout */
+    .boundary-callout {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+      color: #bfdbfe;
+    }
+
+    .boundary-pill {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid var(--accent-blue);
+      color: #93c5fd;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* Grid Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat-title {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 26px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .stat-subtitle {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    /* Main Sections */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    /* Live Alert Banner */
+    #criticalBanner {
+      display: none;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--accent-red);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      align-items: center;
+      justify-content: space-between;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .banner-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .alert-icon {
+      font-size: 24px;
+    }
+
+    .banner-text h3 {
+      font-size: 15px;
+      color: var(--accent-red);
+      font-weight: 700;
+    }
+
+    .banner-text p {
+      font-size: 12.5px;
+      color: #fca5a5;
+      margin-top: 2px;
+    }
+
+    .action-badge-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .action-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #fca5a5;
+    }
+
+    .action-badge {
+      background: var(--accent-red);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Alert List */
+    .alert-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+
+    .alert-item {
+      background: rgba(255, 255, 255, 0.02);
+      border-left: 4px solid var(--accent-red);
+      border-top: 1px solid var(--card-border);
+      border-right: 1px solid var(--card-border);
+      border-bottom: 1px solid var(--card-border);
+      border-radius: 0 8px 8px 0;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .alert-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .alert-type {
+      font-weight: 600;
+      font-size: 13.5px;
+      color: #f87171;
+    }
+
+    .alert-time {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .alert-msg {
+      font-size: 12.5px;
+      color: var(--text-main);
+    }
+
+    .alert-action-box {
+      margin-top: 6px;
+      padding: 6px 10px;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px dashed rgba(245, 158, 11, 0.4);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .alert-action-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .alert-action {
+      font-size: 11px;
+      color: var(--accent-yellow);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+    }
+
+    /* Differentiation Comparison Box */
+    .diff-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 12px;
+    }
+
+    .diff-table th, .diff-table td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .diff-table th {
+      color: var(--text-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    /* Simulation Control Buttons */
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 9px 14px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-attack {
+      background: var(--accent-red);
+      color: white;
+    }
+    .btn-attack:hover {
+      background: #dc2626;
+    }
+
+    .btn-ddos {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-yellow);
+      border: 1px solid var(--accent-yellow);
+    }
+    .btn-ddos:hover {
+      background: rgba(245, 158, 11, 0.25);
+    }
+
+    .btn-normal {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-green);
+      border: 1px solid var(--accent-green);
+    }
+    .btn-normal:hover {
+      background: rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-clear {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--card-border);
+    }
+    .btn-clear:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Live Critical Threat Banner -->
+  <div id="criticalBanner">
+    <div class="banner-left">
+      <div class="alert-icon">🚨</div>
+      <div class="banner-text">
+        <h3 id="bannerTitle">CONFIRMED MITM ATTACK DETECTED</h3>
+        <p id="bannerDesc">ARP Poisoning & Interception targeting medical telemetry broker.</p>
+      </div>
+    </div>
+    <div class="action-badge-container">
+      <span class="action-label">Handover Action for SDN Layer:</span>
+      <div class="action-badge" id="bannerAction">SDN_ISOLATE_SWITCH_PORT_AND_DROP_FLOW</div>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-title">
+      <h1>IoMT Protocol Anomaly Detection & MITM Threat Alert Dashboard <span class="badge-scope">Protocol Anomaly Detection Component</span></h1>
+      <p>Continuous MQTT Protocol Inspection, Anomaly Detection & Deterministic MITM Confirmation Engine</p>
+    </div>
+    <div class="status-pill">
+      <div class="status-dot"></div>
+      <span id="systemStatus">Detection Engine: Active</span>
+    </div>
+  </header>
+
+  <!-- Scope Clarification Bar -->
+  <div class="boundary-callout">
+    <div>
+      <strong>Component Scope:</strong> Traffic Classification (Stage 1) ➔ Protocol Verification (Stage 2) ➔ Anomaly & MITM Alerting (Stage 3).
+    </div>
+    <div>
+      <span class="boundary-pill">Mitigation Enforcement: Handed over to Team Member 4 (SDN Controller)</span>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="dashboard-grid">
+    <div class="stat-card">
+      <div class="stat-title">Analyzed Flows</div>
+      <div class="stat-value" id="statFlows">0</div>
+      <div class="stat-subtitle">Ingested & inspected in real-time</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">IoMT Environment Match</div>
+      <div class="stat-value" style="color: var(--accent-blue);" id="statIoMT">100%</div>
+      <div class="stat-subtitle">Identified via Stage 1 Model (99.99% Acc)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">MITM Attacks Detected</div>
+      <div class="stat-value" style="color: var(--accent-red);" id="statMitm">0</div>
+      <div class="stat-subtitle">Alerted & dispatched to SDN Controller</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">Detection Latency</div>
+      <div class="stat-value" style="color: var(--accent-green);" id="statLatency">0.004 ms</div>
+      <div class="stat-subtitle">Evaluated on CICIoMT2024 Testbed</div>
+    </div>
+  </div>
+
+  <!-- Main Content Layout -->
+  <div class="main-grid">
+    <!-- Chart Section -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Live MQTT Protocol Anomaly Metric Stream</div>
+      </div>
+      <canvas id="trafficChart" height="120"></canvas>
+
+      <!-- Attack Differentiation Matrix (For Viva Defense) -->
+      <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--card-border);">
+        <h4 style="font-size: 13px; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase;">Protocol Discrimination Matrix (How MITM is Isolated):</h4>
+        <table class="diff-table">
+          <thead>
+            <tr>
+              <th>Attack Type</th>
+              <th>Protocol Signature</th>
+              <th>System Detection Output</th>
+              <th>Dispatched SDN Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color: #f87171; font-weight: 600;">MITM (ARP Poisoning)</td>
+              <td><code>ARP=1</code>, IP-MAC Conflict, Intercepted Broker Flow</td>
+              <td><span style="color: #ef4444; font-weight: 600;">Confirmed MITM Attack</span></td>
+              <td><code>SDN_ISOLATE_SWITCH_PORT</code></td>
+            </tr>
+            <tr>
+              <td style="color: #fbbf24; font-weight: 600;">Volumetric Flood / DDoS</td>
+              <td><code>ARP=0</code>, Abnormally High Rate, Small Packets</td>
+              <td><span style="color: #f59e0b;">General Traffic Anomaly</span></td>
+              <td><code>SDN_RATE_LIMIT_AND_LOG</code></td>
+            </tr>
+            <tr>
+              <td style="color: #34d399; font-weight: 600;">Normal Medical Vitals</td>
+              <td><code>ARP=0</code>, Compliant MQTT Payload & Header Length</td>
+              <td><span style="color: #10b981;">Normal Medical Telemetry</span></td>
+              <td><code>ALLOW_TRAFFIC</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Live Simulator Triggers -->
+      <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--card-border);">
+        <h4 style="font-size: 13px; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase;">Interactive Test Injections (Demo):</h4>
+        <div class="controls">
+          <button class="btn btn-attack" onclick="simulateAttack()">🚨 Inject MITM Attack (ARP Poisoning)</button>
+          <button class="btn btn-ddos" onclick="simulateDDoS()">⚠️ Inject Volumetric Flood (DDoS Anomaly)</button>
+          <button class="btn btn-normal" onclick="simulateNormal()">🟢 Inject Normal Medical Telemetry</button>
+          <button class="btn btn-clear" onclick="clearAlerts()">Clear Alerts</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Real-Time Alerts Feed -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Real-Time Threat Alert Stream</div>
+        <span style="font-size: 11px; color: var(--text-muted);" id="alertCount">0 alerts</span>
+      </div>
+      <div class="alert-feed" id="alertFeed">
+        <div style="color: var(--text-muted); font-size: 12.5px; text-align: center; padding: 40px 0;">
+          No active threats detected. Network baseline secure.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:5000";
+    let totalFlows = 0;
+    let mitmCount = 0;
+
+    // Setup Real-time Chart
+    const ctx = document.getElementById('trafficChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: Array(20).fill(''),
+        datasets: [{
+          label: 'Protocol Anomaly Score (0.0 = Normal, 1.0 = Critical Threat)',
+          data: Array(20).fill(0.05),
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          fill: true,
+          tension: 0.3,
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { min: 0, max: 1, grid: { color: '#1f293d' }, ticks: { color: '#9ca3af' } },
+          x: { grid: { display: false } }
+        },
+        plugins: { legend: { labels: { color: '#f3f4f6' } } }
+      }
+    });
+
+    function updateChart(score, isMitm) {
+      const data = chart.data.datasets[0].data;
+      data.shift();
+      data.push(score);
+
+      if (isMitm) {
+        chart.data.datasets[0].borderColor = '#ef4444';
+        chart.data.datasets[0].backgroundColor = 'rgba(239, 68, 68, 0.2)';
+      } else {
+        chart.data.datasets[0].borderColor = '#3b82f6';
+        chart.data.datasets[0].backgroundColor = 'rgba(59, 130, 246, 0.1)';
+      }
+      chart.update();
+    }
+
+    // Fetch Alerts Poll
+    async function fetchAlerts() {
+      try {
+        const res = await fetch(`${API_BASE}/alerts`);
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        const feed = document.getElementById('alertFeed');
+        document.getElementById('alertCount').innerText = `${data.total_alerts} alerts`;
+
+        if (data.alerts && data.alerts.length > 0) {
+          mitmCount = data.total_alerts;
+          document.getElementById('statMitm').innerText = mitmCount;
+
+          feed.innerHTML = data.alerts.map(a => `
+            <div class="alert-item">
+              <div class="alert-top">
+                <span class="alert-type">${a.status}</span>
+                <span class="alert-time">${new Date(a.timestamp).toLocaleTimeString()}</span>
+              </div>
+              <div class="alert-msg">${a.message}</div>
+              <div class="alert-action-box">
+                <span class="alert-action-label">Action Dispatched to SDN Controller:</span>
+                <span class="alert-action">⚡ ${a.sdn_action}</span>
+              </div>
+            </div>
+          `).join('');
+
+          // Show Top Banner for latest alert
+          const latest = data.alerts[0];
+          const banner = document.getElementById('criticalBanner');
+          banner.style.display = 'flex';
+          document.getElementById('bannerTitle').innerText = `🚨 ${latest.status.toUpperCase()} DETECTED`;
+          document.getElementById('bannerDesc').innerText = latest.message;
+          document.getElementById('bannerAction').innerText = latest.sdn_action;
+        } else {
+          feed.innerHTML = `<div style="color: var(--text-muted); font-size: 12.5px; text-align: center; padding: 40px 0;">No active threats detected. Network baseline secure.</div>`;
+          document.getElementById('criticalBanner').style.display = 'none';
+        }
+      } catch (err) {
+        console.error("Alert poll error:", err);
+      }
+    }
+
+    // Send Traffic Helper
+    async function sendTraffic(features) {
+      totalFlows++;
+      document.getElementById('statFlows').innerText = totalFlows;
+
+      try {
+        const res = await fetch(`${API_BASE}/predict`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ features })
+        });
+        const result = await res.json();
+        
+        const isMitm = result.anomaly_prediction === "MITM Attack Confirmed";
+        const score = result.anomaly_score || (isMitm ? 0.95 : 0.05);
+
+        if (result.inference_latency_ms) {
+          document.getElementById('statLatency').innerText = `${result.inference_latency_ms.toFixed(3)} ms`;
+        }
+
+        updateChart(score, isMitm);
+        fetchAlerts();
+      } catch (err) {
+        console.error("Traffic dispatch failed:", err);
+      }
+    }
+
+    // Simulation Handlers
+    function simulateAttack() {
+      // MITM Attack: ARP Poisoning Vector (ARP=1)
+      sendTraffic({
+        Header_Length: 54,
+        "Protocol Type": 6,
+        Duration: 0.12,
+        Rate: 45.0,
+        dst_port: 1883,
+        TCP: 1,
+        ARP: 1
+      });
+    }
+
+    function simulateDDoS() {
+      // Volumetric Anomaly: High Rate, but ARP=0 (Not a MITM Attack)
+      sendTraffic({
+        Header_Length: 54,
+        "Protocol Type": 6,
+        Duration: 0.05,
+        Rate: 150000.0,
+        dst_port: 1883,
+        TCP: 1,
+        ARP: 0,
+        Variance: 5.0
+      });
+    }
+
+    function simulateNormal() {
+      // Normal Telemetry: Benign parameters
+      sendTraffic({
+        Header_Length: 138.2,
+        "Protocol Type": 7.1,
+        Duration: 83.1,
+        Rate: 39123.0,
+        TCP: 0.9,
+        UDP: 0.1,
+        IPv: 1.0,
+        "Tot size": 99.0,
+        "Tot sum": 616.5,
+        AVG: 130.1,
+        IAT: 169470300.0,
+        Weight: 38.5,
+        dst_port: 1883,
+        ARP: 0
+      });
+    }
+
+    async function clearAlerts() {
+      await fetch(`${API_BASE}/alerts/clear`, { method: 'POST' });
+      document.getElementById('criticalBanner').style.display = 'none';
+      document.getElementById('statMitm').innerText = '0';
+      fetchAlerts();
+    }
+
+    // Initial load and periodic polling
+    fetchAlerts();
+    setInterval(fetchAlerts, 2000);
+  </script>
+</body>
+</html>

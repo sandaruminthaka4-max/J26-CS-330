@@ -1,0 +1,28 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Large Dataset Files (Do not commit 65MB+ CSVs to Git)
+data/processed/
+data/raw/
+*.csv
+*.parquet
+*.pcap
+
+# Large Models (Optional: comment out if you want to push models to GitHub)
+# GitHub allows files up to 100MB. Our models are ~5MB, so they CAN be tracked if needed.
+# models/*.joblib
+
+# OS generated
+.DS_Store
+Thumbs.db
+desktop.ini
