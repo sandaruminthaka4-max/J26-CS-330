@@ -767,7 +767,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      max-height: 380px;
+      max-height: 500px;
       overflow-y: auto;
     }
 
@@ -887,67 +887,6 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
-    }
-
-    /* NHSL Hospital Surveillance Node Metadata Grid */
-    .hospital-meta-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .hospital-meta-tile {
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid var(--card-border);
-      border-radius: 6px;
-      padding: 8px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-    .hospital-meta-tile .meta-title {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--accent-cyan);
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-    }
-    .hospital-meta-tile .meta-val {
-      font-size: 11.5px;
-      font-weight: 600;
-      color: var(--text-main);
-    }
-    .hospital-meta-tile .meta-sub {
-      font-size: 10px;
-      color: var(--accent-green);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    /* Hospital Telemetry Integrity Table */
-    .telemetry-integrity-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 11px;
-      margin-top: 8px;
-    }
-    .telemetry-integrity-table th {
-      background: rgba(30, 41, 59, 0.6);
-      color: var(--text-muted);
-      text-transform: uppercase;
-      font-size: 9.5px;
-      padding: 6px 8px;
-      text-align: left;
-    }
-    .telemetry-integrity-table td {
-      padding: 6px 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      font-family: 'JetBrains Mono', monospace;
-    }
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .alert-time {
@@ -1339,87 +1278,6 @@
             </tr>
           </tbody>
         </table>
-      </div>
-
-      <!-- 3. National Hospital of Sri Lanka (NHSL) ICU Surveillance Node -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <span>🏥 National Hospital of Sri Lanka (NHSL) — Central ICU Surveillance Node</span>
-          </div>
-          <span style="font-size: 10px; color: var(--accent-green); background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); padding: 2px 7px; border-radius: 4px; font-weight: 700;">LIVE TELEMETRY NODE</span>
-        </div>
-
-        <p style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 6px;">
-          Central hospital telemetry surveillance facility monitoring real-time clinical IoMT sensor streams:
-        </p>
-
-        <!-- Facility Metadata Grid -->
-        <div class="hospital-meta-grid">
-          <div class="hospital-meta-tile">
-            <span class="meta-title">Hospital Facility</span>
-            <span class="meta-val">National Hospital of Sri Lanka (NHSL)</span>
-            <span class="meta-sub">Tower B • Ward 4 ICU &amp; CCU Complex</span>
-          </div>
-          <div class="hospital-meta-tile">
-            <span class="meta-title">Surveillance Node ID</span>
-            <span class="meta-val">NHSL-ICU-TEL-NODE-01</span>
-            <span class="meta-sub">● Online • 24/7 Continuous Telemetry</span>
-          </div>
-          <div class="hospital-meta-tile">
-            <span class="meta-title">Ingestion Architecture</span>
-            <span class="meta-val">Passive SPAN Port Mirror Tap</span>
-            <span class="meta-sub">● 0.000 ms Inline Delay (Zero Patient Risk)</span>
-          </div>
-          <div class="hospital-meta-tile">
-            <span class="meta-title">Inspection Pipeline</span>
-            <span class="meta-val">4-Stage Protocol ML Pipeline</span>
-            <span class="meta-sub">● IT23368248 Protocol Anomaly Engine</span>
-          </div>
-        </div>
-
-        <!-- Telemetry Ingestion Standards Table -->
-        <table class="telemetry-integrity-table">
-          <thead>
-            <tr>
-              <th>IoMT Telemetry Source</th>
-              <th>Protocol Standard</th>
-              <th>Sample Rate</th>
-              <th>Surveillance State</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>💉 Alaris PK-04 (Infusion Pump)</td>
-              <td>MQTT / Port 1883 (JSON Telemetry)</td>
-              <td>1.0 Hz Rate</td>
-              <td><span style="color: var(--accent-green);">● Active Stream (Normal)</span></td>
-            </tr>
-            <tr>
-              <td>🫀 Philips IntelliVue (Cardiac Monitor)</td>
-              <td>Lead-II Continuous ECG Waveform</td>
-              <td>250 Hz Stream</td>
-              <td><span style="color: var(--accent-green);">● Active Stream (Normal)</span></td>
-            </tr>
-            <tr>
-              <td>🫁 Hamilton-C6 (Smart Ventilator)</td>
-              <td>Hamilton Medical Bus Protocol</td>
-              <td>20 Hz Telemetry</td>
-              <td><span style="color: var(--accent-green);">● Active Stream (Normal)</span></td>
-            </tr>
-            <tr>
-              <td>🩺 Mindray BeneVision (Bedside NIBP)</td>
-              <td>HL7 / MQTT Vitals Aggregator</td>
-              <td>Periodic Heartbeat</td>
-              <td><span style="color: var(--accent-green);">● Active Stream (Normal)</span></td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div style="margin-top: 10px; background: rgba(59, 130, 246, 0.06); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 6px; padding: 7px 10px; font-size: 11px; color: #bfdbfe; display: flex; align-items: center; gap: 6px;">
-          <span>ℹ️</span>
-          <span><strong>Clinical Safety Standard:</strong> Surveillance operates strictly via non-intrusive passive packet mirroring; completely isolated from medical device actuation circuits.</span>
-        </div>
       </div>
     </div>
   </div>
