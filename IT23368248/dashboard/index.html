@@ -767,7 +767,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      max-height: 620px;
+      max-height: 380px;
       overflow-y: auto;
     }
 
@@ -798,6 +798,160 @@
       font-size: 13.5px;
       font-weight: 700;
       color: #93c5fd;
+    }
+
+    /* 3-Step Structured Causality Breakdown in Alert Cards */
+    .alert-causality-container {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 6px;
+    }
+
+    .causality-box {
+      border-radius: 6px;
+      padding: 8px 11px;
+      font-size: 11.5px;
+      line-height: 1.45;
+    }
+
+    .causality-box.step-pre {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #d1fae5;
+    }
+    .causality-box.step-pre .causality-title {
+      color: #34d399;
+      font-weight: 700;
+      font-size: 11px;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .causality-box.step-tamper {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #dbeafe;
+    }
+    .causality-box.step-tamper .causality-title {
+      color: #60a5fa;
+      font-weight: 700;
+      font-size: 11px;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .causality-box.step-post {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fee2e2;
+    }
+    .causality-box.step-post .causality-title {
+      color: #f87171;
+      font-weight: 700;
+      font-size: 11px;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Right Column Layout & Panels */
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Subnet & VLAN Table */
+    .vlan-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
+      margin-top: 6px;
+    }
+    .vlan-table th {
+      background: rgba(30, 41, 59, 0.6);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-size: 10px;
+      padding: 7px 9px;
+      text-align: left;
+    }
+    .vlan-table td {
+      padding: 7px 9px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+
+    /* Protocol Defense Matrix Grid */
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .matrix-tile {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .matrix-tile .matrix-layer {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+    }
+    .matrix-tile .matrix-feature {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .matrix-tile .matrix-status {
+      font-size: 10px;
+      color: var(--accent-green);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Bedside Checklist */
+    .checklist-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 11.5px;
+      color: #cbd5e1;
+      line-height: 1.4;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 7px 10px;
+      border-radius: 6px;
+      border-left: 3px solid var(--accent-blue);
+    }
+    .checklist-num {
+      background: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 10.5px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
       display: flex;
       align-items: center;
       gap: 6px;
@@ -1134,15 +1288,130 @@
       </div>
     </div>
 
-    <!-- Right Column: Real-Time Alerts Feed -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Real-Time Threat Alert Stream</div>
-        <span style="font-size: 11px; color: var(--text-muted);" id="alertCount">0 alerts</span>
+    <!-- Right Column: Real-Time Alerts Feed & Hospital Telemetry Panels -->
+    <div class="right-column">
+      <!-- 1. Real-Time Threat Alert Stream -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Real-Time Threat Alert Stream</div>
+          <span style="font-size: 11px; color: var(--text-muted);" id="alertCount">0 alerts</span>
+        </div>
+        <div class="alert-feed" id="alertFeed">
+          <div style="color: var(--text-muted); font-size: 12.5px; text-align: center; padding: 40px 0;">
+            No active threats detected. Hospital ICU telemetry baseline secure.
+          </div>
+        </div>
       </div>
-      <div class="alert-feed" id="alertFeed">
-        <div style="color: var(--text-muted); font-size: 12.5px; text-align: center; padding: 40px 0;">
-          No active threats detected. Hospital ICU telemetry baseline secure.
+
+      <!-- 2. Hospital Clinical Subnet & IoMT VLAN Infrastructure Monitor -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>🏥 Hospital Clinical Subnet &amp; IoMT VLAN Monitor</span>
+          </div>
+          <span class="boundary-pill">Live Topology</span>
+        </div>
+        <p style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 8px;">
+          Continuous telemetry state across isolated medical VLANs &amp; hospital aggregator switch:
+        </p>
+        <table class="vlan-table">
+          <thead>
+            <tr>
+              <th>VLAN / Zone</th>
+              <th>Subnet &amp; Target</th>
+              <th>Protocol Profile</th>
+              <th>Inspection Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span style="color: var(--accent-rose); font-weight: 700;">VLAN 4</span> (ICU Infusion)</td>
+              <td>192.168.10.45 (Bed #04 - Kamal)</td>
+              <td>MQTT / Port 1883</td>
+              <td><span style="color: var(--accent-green);">● Active DAI / Filter</span></td>
+            </tr>
+            <tr>
+              <td><span style="color: var(--accent-red); font-weight: 700;">VLAN 2</span> (CCU Cardiac)</td>
+              <td>192.168.10.22 (Bed #02 - Sunil)</td>
+              <td>ECG Waveform Stream</td>
+              <td><span style="color: var(--accent-green);">● Active ARP Guard</span></td>
+            </tr>
+            <tr>
+              <td><span style="color: var(--accent-purple); font-weight: 700;">VLAN 1</span> (Life Support)</td>
+              <td>192.168.10.18 (Bed #01 - Nimali)</td>
+              <td>Hamilton Medical Bus</td>
+              <td><span style="color: var(--accent-green);">● Active DNSSEC Trap</span></td>
+            </tr>
+            <tr>
+              <td><span style="color: var(--accent-cyan); font-weight: 700;">VLAN 12</span> (Ward Recovery)</td>
+              <td>192.168.10.33 (Bed #12 - Anura)</td>
+              <td>Mindray NIBP/SpO2</td>
+              <td><span style="color: var(--accent-green);">● Active Telemetry Guard</span></td>
+            </tr>
+            <tr>
+              <td><span style="color: var(--accent-yellow); font-weight: 700;">Core Uplink</span> (Gateway)</td>
+              <td>192.168.10.1 (Cisco IE-4000)</td>
+              <td>ICU Aggregator Trunk</td>
+              <td><span style="color: var(--accent-cyan);">● 120 flows/s (Norm)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 3. Active MITM Protocol Defense & Clinical Bedside Action Checklist -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>🛡️ Active MITM Defense &amp; Clinical Action Protocol</span>
+          </div>
+          <span style="font-size: 10px; color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace;">ZERO-TRUST IoMT</span>
+        </div>
+
+        <div class="matrix-grid">
+          <div class="matrix-tile">
+            <span class="matrix-layer">Layer 2 (Data Link)</span>
+            <span class="matrix-feature">Dynamic ARP Inspection</span>
+            <span class="matrix-status"><span>✓</span> Zero-Trust MAC Binding</span>
+          </div>
+          <div class="matrix-tile">
+            <span class="matrix-layer">Layer 3 (Network)</span>
+            <span class="matrix-feature">DNS Poisoning Trap</span>
+            <span class="matrix-status"><span>✓</span> Rogue Broker Filter</span>
+          </div>
+          <div class="matrix-tile">
+            <span class="matrix-layer">Layer 7 (Application)</span>
+            <span class="matrix-feature">MQTT Payload Variance</span>
+            <span class="matrix-status"><span>✓</span> Dosage Surge Guard</span>
+          </div>
+          <div class="matrix-tile">
+            <span class="matrix-layer">Layer 4 (Transport)</span>
+            <span class="matrix-feature">Rate Anomaly Filter</span>
+            <span class="matrix-status"><span>✓</span> DDoS Velocity Isolation</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 14px; border-top: 1px solid var(--card-border); padding-top: 10px;">
+          <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            <span>📋 Clinical Bedside Emergency Action Checklist (Code-Blue IoMT)</span>
+          </div>
+          <div class="checklist-list">
+            <div class="checklist-item">
+              <span class="checklist-num">01</span>
+              <div><strong>Immediate Bedside Cross-Check:</strong> Manually measure patient vitals using analog sphygmomanometer &amp; independent pulse oximeter.</div>
+            </div>
+            <div class="checklist-item">
+              <span class="checklist-num">02</span>
+              <div><strong>Device Fail-Safe Disconnection:</strong> Disconnect suspect IoMT Ethernet/Wi-Fi to force device into offline standalone mode.</div>
+            </div>
+            <div class="checklist-item">
+              <span class="checklist-num">03</span>
+              <div><strong>Manual Infusion / Ventilator Override:</strong> Switch infusion pumps to manual syringe/gravity feed; ensure Ambu bag available at bedside.</div>
+            </div>
+            <div class="checklist-item">
+              <span class="checklist-num">04</span>
+              <div><strong>Clinical Escalation:</strong> Immediately notify ICU Attending Physician, Charge Nurse, and Biomedical Engineering on duty.</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1396,7 +1665,7 @@
       document.getElementById('cmpTampered').innerText = tv.tampered_value || "Normal Telemetry";
       document.getElementById('cmpHazard').innerText = tv.patient_condition || "Patient Stable";
 
-      rsk.innerText = tv.morbidity_mortality_hazard || result.clinical_risk || "Normal Physiological Telemetry";
+      rsk.innerText = tv.post_attack_morbidity || tv.morbidity_mortality_hazard || result.clinical_risk || "Normal Physiological Telemetry";
       lsb.innerText = result.life_saving_impact || "Standard baseline monitoring maintained.";
 
       if (isMitm) {
@@ -1454,17 +1723,22 @@
           feed.innerHTML = data.alerts.map(a => {
             const isMitm = a.status && a.status.includes("MITM");
             const alertTimeStr = new Date(a.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const bv = a.baseline_vitals || {};
             const tv = a.tampered_vitals || {};
+            const preBaseline = bv.pre_attack_baseline || bv.patient_condition || 'Patient stable on compliant clinical baseline vitals.';
+            const dataNetwork = tv.data_network_alteration || 'In-transit medical telemetry payload intercepted and manipulated on network stream.';
+            const postMorbidity = tv.post_attack_morbidity || tv.morbidity_mortality_hazard || a.clinical_risk;
+
             return `
               <div class="alert-item ${isMitm ? '' : 'ddos-item'}">
                 <div class="alert-top">
                   <span class="alert-patient-headline">
-                    👤 ${a.patient_name || 'Patient'} ${a.patient_age ? `(${a.patient_age}y)` : ''}
+                    ${isMitm ? '👤' : '🏢'} ${a.patient_name || 'Patient'} ${a.patient_age ? `(${a.patient_age}y${a.patient_gender ? ', ' + a.patient_gender : ''})` : ''}
                   </span>
                   <span class="alert-time">⏱️ ${alertTimeStr}</span>
                 </div>
                 <div class="alert-patient-meta">
-                  <strong>Diagnosis:</strong> ${a.medical_diagnosis || 'Intensive Care Monitoring'}
+                  <strong>Clinical Context:</strong> ${a.medical_diagnosis || 'Intensive Care Monitoring'}
                 </div>
                 <div class="alert-device-row">
                   <span>📍 ${a.hospital_location || 'ICU'}</span>
@@ -1474,8 +1748,21 @@
                 <div class="alert-msg" style="color: ${isMitm ? '#fca5a5' : '#fde68a'}; font-weight: 600;">
                   ${a.message}
                 </div>
-                <div class="alert-risk-badge">
-                  <strong>⚠️ Immediate Clinical Hazard:</strong> ${tv.morbidity_mortality_hazard || a.clinical_risk || a.threat_type}
+
+                <!-- 3-Part Structured Clinical & Network Causality Breakdown -->
+                <div class="alert-causality-container">
+                  <div class="causality-box step-pre">
+                    <div class="causality-title">🟢 Pre-Attack Baseline Situation:</div>
+                    <div class="causality-text">${preBaseline}</div>
+                  </div>
+                  <div class="causality-box step-tamper">
+                    <div class="causality-title">⚡ Device Data &amp; Network Alteration:</div>
+                    <div class="causality-text">${dataNetwork}</div>
+                  </div>
+                  <div class="causality-box step-post">
+                    <div class="causality-title">🚨 Post-Attack Clinical Deterioration (Worst-Case Hazard):</div>
+                    <div class="causality-text">${postMorbidity}</div>
+                  </div>
                 </div>
               </div>
             `;
@@ -1485,11 +1772,14 @@
           const latest = data.alerts[0];
           const banner = document.getElementById('criticalBanner');
           banner.style.display = 'flex';
-          document.getElementById('bannerTitle').innerText = `🚨 CRITICAL MITM INTRUSION DETECTED`;
-          document.getElementById('bannerPatient').innerText = `Target Patient: ${latest.patient_name || 'Patient'} ${latest.patient_age ? `(${latest.patient_age}y, ${latest.patient_gender})` : ''} — ${latest.medical_diagnosis || 'Critical Care'}`;
-          document.getElementById('bannerMeta').innerText = `Connected Device: ${latest.target_device} | ${latest.hospital_location} | IP: ${latest.device_ip} | Alerted at: ${new Date(latest.timestamp).toLocaleTimeString()}`;
+          const isLatestMitm = latest.status && latest.status.includes("MITM");
+          document.getElementById('bannerTitle').innerText = isLatestMitm 
+            ? `🚨 CRITICAL MITM INTRUSION DETECTED` 
+            : `⚠️ VOLUMETRIC BUFFER SATURATION DETECTED (NON-MITM)`;
+          document.getElementById('bannerPatient').innerText = `Target: ${latest.patient_name || 'Patient'} ${latest.patient_age ? `(${latest.patient_age}y, ${latest.patient_gender})` : ''} — ${latest.medical_diagnosis || 'Critical Care'}`;
+          document.getElementById('bannerMeta').innerText = `Device: ${latest.target_device} | Location: ${latest.hospital_location} | IP: ${latest.device_ip} | Alert Time: ${new Date(latest.timestamp).toLocaleTimeString()}`;
           const tvLatest = latest.tampered_vitals || {};
-          document.getElementById('bannerHazard').innerText = `⚠️ CLINICAL HAZARD: ${tvLatest.morbidity_mortality_hazard || latest.clinical_risk || 'Targeted protocol alteration in progress.'}`;
+          document.getElementById('bannerHazard').innerText = `⚠️ CLINICAL HAZARD: ${tvLatest.post_attack_morbidity || tvLatest.morbidity_mortality_hazard || latest.clinical_risk || 'Targeted protocol alteration in progress.'}`;
         } else {
           feed.innerHTML = `<div style="color: var(--text-muted); font-size: 12.5px; text-align: center; padding: 40px 0;">No active threats detected. Hospital ICU telemetry baseline secure.</div>`;
           document.getElementById('criticalBanner').style.display = 'none';

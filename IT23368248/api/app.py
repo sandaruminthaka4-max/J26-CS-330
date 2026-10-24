@@ -426,12 +426,15 @@ def predict():
         baseline_vitals = {
             "parameter": "IV Insulin Infusion Rate",
             "normal_value": "2.0 units/hr",
-            "patient_condition": "STABLE — Blood Glucose 180 mg/dL (Target: 140-180 mg/dL)"
+            "patient_condition": "STABLE — Blood Glucose 180 mg/dL (Target: 140-180 mg/dL)",
+            "pre_attack_baseline": "Stable Diabetic Ketoacidosis control: Blood glucose maintained at 180 mg/dL under continuous IV insulin infusion of 2.0 units/hr."
         }
         tampered_vitals = {
             "parameter": "Tampered MQTT Control Payload",
             "tampered_value": "25.0 units/hr (12.5x Overdose Surge)",
             "patient_condition": "CRITICAL: Severe Hypoglycemic Stupor & Coma (Glucose: 38 mg/dL)",
+            "data_network_alteration": "L7 Application Layer: Attacker intercepted MQTT publish packet on topic 'hospital/icu/bed04/infusion_rate' and forged dosage payload from 2.0 units/hr to 25.0 units/hr.",
+            "post_attack_morbidity": "Precipitous 12.5x insulin overdose triggers rapid intravascular glucose depletion down to 38 mg/dL -> acute neuroglycopenic seizure, irreversible brain injury, and fatal Hypoglycemic Coma!",
             "morbidity_mortality_hazard": "Precipitous insulin surge induces Acute Hypoglycemic Coma, loss of consciousness, and neuroglycopenic seizure crisis!"
         }
         life_saving_impact = "Interception detected in 0.004 ms. Insulin tampering halted before lethal coma progressed. Clinical alert sounded & IV Dextrose protocol initiated; Patient Kamal stabilized."
@@ -439,12 +442,15 @@ def predict():
         baseline_vitals = {
             "parameter": "Continuous Lead-II ECG Rhythm",
             "normal_value": "78 bpm (Normal Sinus Rhythm)",
-            "patient_condition": "MONITORED / STABLE (BP: 125/82 mmHg)"
+            "patient_condition": "MONITORED / STABLE (BP: 125/82 mmHg)",
+            "pre_attack_baseline": "Post-Myocardial Infarction stability: Normal sinus rhythm at 78 bpm, stable hemodynamics with arterial pressure 125/82 mmHg."
         }
         tampered_vitals = {
             "parameter": "L2 ARP Cache Poisoned Replay Packet",
             "tampered_value": "Spoofed 75 bpm Fake Normal Waveform (Replay Attack)",
             "patient_condition": "CRITICAL: Undetected Malignant Arrhythmia & Acute Hypotension (BP: 60/40 mmHg)",
+            "data_network_alteration": "L2 Data Link Layer: Gratuitous ARP poisoning deceived bedside switch, diverting live ECG telemetry to attacker proxy. Attacker transmitted replay packets of 75 bpm sinus rhythm while real heart developed Ventricular Tachycardia.",
+            "post_attack_morbidity": "Concealed Paroxysmal Ventricular Tachycardia (180+ bpm) masked by fake 75 bpm waveform prevents defibrillation alert -> rapid progression to cardiogenic shock, ventricular fibrillation, and sudden cardiac death!",
             "morbidity_mortality_hazard": "Replay attack conceals onset of Paroxysmal Ventricular Tachycardia; uncorrected rhythm instability induces acute cardiogenic shock and circulatory collapse!"
         }
         life_saving_impact = "ARP cache poisoning detected in 0.004 ms. Spoofed telemetry dropped. Emergency telemetry override sounded; Antiarrhythmic therapy initiated for Sunil."
@@ -452,12 +458,15 @@ def predict():
         baseline_vitals = {
             "parameter": "Mechanical Ventilation PEEP & Respiration",
             "normal_value": "16 breaths/min | PEEP: 10 cmH2O | SpO2: 96%",
-            "patient_condition": "STABLE LIFE SUPPORT"
+            "patient_condition": "STABLE LIFE SUPPORT",
+            "pre_attack_baseline": "Synchronized mechanical ventilation for ARDS: Respiration 16 bpm, PEEP 10 cmH2O, FiO2 45%, maintaining arterial oxygen saturation (SpO2) at 96%."
         }
         tampered_vitals = {
             "parameter": "L3 DNS Diverted Command Stream",
             "tampered_value": "PEEP dropped to 0 cmH2O | FiO2 Reduced to 21%",
             "patient_condition": "CRITICAL: Acute Hypoxemic Respiratory Distress & Atelectasis (SpO2: 68%)",
+            "data_network_alteration": "L3 Network Layer: Rogue DNS response cache poisoning diverted ventilator command socket to rogue controller IP. Malicious control packet injected setting PEEP to 0 cmH2O and suffocating FiO2 to ambient 21%.",
+            "post_attack_morbidity": "Complete collapse of positive end-expiratory pressure (PEEP 0) causes instantaneous alveolar collapse (acute atelectasis) -> intrapulmonary shunting, SpO2 plunge to 68%, cyanosis, and fatal asphyxiation!",
             "morbidity_mortality_hazard": "Loss of positive end-expiratory pressure (PEEP: 0) induces severe alveolar collapse, acute hypoxemia, and cyanosis requiring immediate resuscitation!"
         }
         life_saving_impact = "Rogue DNS broker redirection blocked in 0.004 ms. PEEP restored to 10 cmH2O; Arterial oxygen saturation normalized for Nimali."
@@ -465,12 +474,15 @@ def predict():
         baseline_vitals = {
             "parameter": "Bedside NIBP Blood Pressure & HR",
             "normal_value": "BP: 120/80 mmHg | HR: 74 bpm | SpO2: 98%",
-            "patient_condition": "POST-OP RECOVERY (Abdominal Laparotomy)"
+            "patient_condition": "POST-OP RECOVERY (Abdominal Laparotomy)",
+            "pre_attack_baseline": "Routine post-surgical recovery (exploratory laparotomy): Hemodynamically stable, BP 120/80 mmHg, HR 74 bpm, conscious and communicative."
         }
         tampered_vitals = {
             "parameter": "Spoofed Telemetry Injection (L7/L2 Interception)",
             "tampered_value": "Spoofed 120/80 mmHg Normal (Actual BP: 68/42 mmHg, HR: 138 bpm)",
             "patient_condition": "CRITICAL: Concealed Post-Op Internal Hemorrhage & Hypovolemic Shock",
+            "data_network_alteration": "L7/L2 Combined Interception: Mindray bedside telemetry stream wiretapped. True physiological crisis (BP drop to 68/42 mmHg, HR spike to 138 bpm from arterial rupture) intercepted and replaced with synthetic static normal packet (120/80 mmHg).",
+            "post_attack_morbidity": "Masked internal bleeding remains invisible on nursing station displays -> unchecked peritoneal pooling leads to Class IV Hypovolemic Shock, multi-organ ischemic failure, and lethal exsanguination!",
             "morbidity_mortality_hazard": "Adversary freezes vitals at 120/80 mmHg. Concealed intraperitoneal hemorrhage causes severe blood volume loss; patient deteriorates into acute hypovolemic shock!"
         }
         life_saving_impact = "Bedside telemetry spoofing detected in 0.004 ms. False normal reading uncovered. Emergency surgical team mobilized; blood transfusion protocol activated for Anura."
@@ -478,12 +490,15 @@ def predict():
         baseline_vitals = {
             "parameter": "ICU Ward Network Throughput",
             "normal_value": "120 flows/sec (All Beds Connected)",
-            "patient_condition": "ALL PATIENTS ACTIVELY MONITORED"
+            "patient_condition": "ALL PATIENTS ACTIVELY MONITORED",
+            "pre_attack_baseline": "ICU Core Telemetry Switch operating normally: 120 flows/sec aggregated across all patient beds with telemetry propagation latency < 0.5 ms and zero queue drops."
         }
         tampered_vitals = {
             "parameter": "Volumetric Ingestion Exhaustion Flood",
             "tampered_value": "150,000 pkts/sec (Buffer Saturation)",
             "patient_condition": "WARNING: Central ICU Telemetry Queue Latency (+14.2s Delay)",
+            "data_network_alteration": "L4 Transport Layer Volumetric Flood: Attacker flooded switch telemetry buffers with 150,000 pkts/sec UDP/TCP garbage traffic. Correctly isolated as volumetric DDoS flood rather than MITM wiretap.",
+            "post_attack_morbidity": "Switch ingress buffer starvation introduces a catastrophic +14.2 second delay on critical patient telemetry packets, blinding nursing central monitors to concurrent cardiac or respiratory arrests!",
             "morbidity_mortality_hazard": "Buffer exhaustion introduces an unmonitored 14-second lag in vital alarm transmission to the central nursing station."
         }
         life_saving_impact = "Volumetric DDoS packet velocity detected and separated from MITM threats in 0.004 ms. Telemetry priority queues safeguarded for ICU patients."
@@ -491,12 +506,15 @@ def predict():
         baseline_vitals = {
             "parameter": "Multiparameter Bedside Vitals (ECG/SpO2/NIBP)",
             "normal_value": "HR: 74 bpm | SpO2: 98% | BP: 120/80 mmHg",
-            "patient_condition": "STABLE RECOVERY 🟢"
+            "patient_condition": "STABLE RECOVERY 🟢",
+            "pre_attack_baseline": "Normal compliant physiological telemetry: Parameters strictly conform to healthy post-operative recovery baseline."
         }
         tampered_vitals = {
             "parameter": "Compliant Medical MQTT Profile",
             "tampered_value": "No Tampering Detected",
             "patient_condition": "NORMAL PHYSIOLOGICAL VITAL SIGNS",
+            "data_network_alteration": "Zero protocol anomalies: Verified compliant MQTT packet format and legitimate MAC-IP bindings.",
+            "post_attack_morbidity": "None — Patient condition stable. Telemetry verified intact.",
             "morbidity_mortality_hazard": "None — Physiological parameters strictly conform to healthy post-op baseline."
         }
         life_saving_impact = "Traffic permitted. Continuous clinical observation uninterrupted."
