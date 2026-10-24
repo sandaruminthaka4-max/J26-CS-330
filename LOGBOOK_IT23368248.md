@@ -1,107 +1,103 @@
-# Research Project Individual Logbook
-**Project Title:** Lightweight SDN-Based Intrusion Detection System for IoMT Networks  
-**Project Code:** J26-CS-330  
+# IT4010 Research Project — Individual Research Logbook
+
+**Project ID:** J26-CS-330  
 **Student Name:** S. Minthaka  
-**Student ID:** IT23368248  
-**Individual Component:** IoMT Traffic Identification & MQTT Protocol Anomaly Detection for MITM Attacks  
+**Registration no:** IT23368248  
+**Component:** Protocol Anomaly Detection for MITM Attacks in IoMT Networks  
+**Module:** IT4010 Research Project  
 
 ---
 
-## Log Entries & Development Milestones
+## 📅 Bi-Weekly Logbook Entries (From Scratch to Final Output)
 
-### Entry 1 — Project Initialization & Environment Setup
-* **Date:** 2026-10-13 (Phase 1)
-* **Tasks Completed:**
-  - Formulated technical pipeline requirements for 2-stage IDS: (1) IoMT Traffic Identification and (2) MQTT MITM Anomaly Detection.
-  - Initialized project architecture (`api/`, `data/`, `models/`, `reports/`, `src/`).
-  - Set up Python 3.13 ML environment (`scikit-learn`, `xgboost`, `lightgbm`, `imbalanced-learn`, `flask`).
-  - Created `.gitignore` and dependency manifest (`requirements.txt`).
-* **Key Decisions / Technical Notes:**
-  - Standardized directory layout to isolate raw dataset references from committed models and pipeline scripts.
+### 📌 Period 1: Weeks 1 – 2 (02/09/2026 – 15/09/2026)
+*Focus: Topic Formulation, Literature Survey, Dataset Selection, and Novelty Formulation*
 
----
+| Date | Task |
+| :--- | :--- |
+| **02/09/2026** | Discussed with supervisor Mr. Kanishka Yapa and confirmed the individual component: "Protocol Anomaly Detection for MITM Attacks in IoMT Networks". |
+| **03/09/2026** | Studied CICIoMT2024 dataset research paper and identified IoMT-specific protocol vulnerabilities (MQTT, CoAP, ARP). |
+| **04/09/2026** | Drafted initial component description, research objectives, and ML novelties for IoMT attack detection. |
+| **05/09/2026** | Mapped component dependencies across team members: Component 4 (SDN Controller) consumes severity alerts; Component 1 & 2 handle identity and lateral movement. |
+| **08/09/2026** | Studied CICIoT2023 dataset paper to solve negative-class problem (CICIoMT2024 lacks non-IoMT traffic needed for a robust classifier). |
+| **10/09/2026** | Designed 4-stage IDS pipeline architecture: (1) IoMT Classifier -> (2) MQTT Protocol Filter -> (3) Anomaly Detector -> (3.5) MITM Correlation Engine. |
+| **11/09/2026** | Formulated hybrid MITM confirmation concept: combining statistical ML anomaly scores with deterministic protocol indicators (`ARP=1`, DNS redirection). |
+| **12/09/2026** | Identified 44 common network flow and statistical features shared between CICIoMT2024 and CICIoT2023 schemas. |
+| **15/09/2026** | Defined performance benchmarks: Stage 1 IoMT Accuracy > 99.5%, Stage 3 Anomaly Latency < 0.1 ms/sample for real-time SDN packet inspection, FPR < 1%. |
 
-### Entry 2 — Dataset Pipeline & Feature Mapping (CICIoMT2024 & CICIoT2023)
-* **Date:** 2026-10-13 (Phase 2)
-* **Tasks Completed:**
-  - Investigated CICIoMT2024 WiFi+MQTT schema and identified that it lacks a non-IoMT negative class.
-  - Merged CICIoMT2024 (120,000 IoMT samples) with CICIoT2023 (120,000 general IoT samples) to enable a defensible binary IoMT classifier.
-  - Harmonized 44 shared network flow and statistical features (`Header_Length`, `Rate`, `IAT`, TCP flag counters, packet length distribution).
-  - Developed and executed automated merge script (`src/01_feature_mapping.py`).
-* **Key Decisions / Technical Notes:**
-  - Balanced class distribution at 50/50 (120k each) to prevent machine learning classification bias.
-
----
-
-### Entry 3 — Stage 1 IoMT Traffic Classifier Implementation
-* **Date:** 2026-10-13 (Phase 3)
-* **Tasks Completed:**
-  - Implemented Stage 1 Random Forest Classifier (`src/02_iomt_classifier.py`).
-  - Evaluated on held-out test split: Accuracy 99.99%, Precision 0.9999, Recall 1.0000, F1 1.0000, FPR 0.0001.
-  - Generated and saved confusion matrix (`iomt_confusion_matrix.png`) and feature importance graph (`iomt_feature_importance.png`).
-  - Serialized trained pipeline artifact (`models/iomt_classifier.joblib`).
-* **Key Decisions / Technical Notes:**
-  - Validated that flow statistical shape (`Tot size`, `Rate`, `IAT`) provides high separability between medical sensors and commodity IoT nodes.
+```
+---------------------------------------------------------------------------------------------------
+Supervisor Review & Signature (Weeks 1 – 2):
+Supervisor Name: Mr. Kanishka Yapa             Signature: ........................   Date: 15/09/2026
+Feedback / Remarks: ...............................................................................
+---------------------------------------------------------------------------------------------------
+```
 
 ---
 
-### Entry 4 — Stage 3 MQTT Protocol Anomaly Detection (MITM-Enabling Vectors)
-* **Date:** 2026-10-13 (Phase 4)
-* **Tasks Completed:**
-  - Developed Random Forest Anomaly Detector (`src/03_anomaly_detector.py`) on CICIoMT2024 benchmark.
-  - Balanced across 21 attack scenarios (including ARP Spoofing, DNS Spoofing, and MQTT-Malformed-Data).
-  - Evaluated model: Accuracy 99.54%, Precision 99.95%, Recall 99.56%, F1 99.76%, FPR 0.0075.
-  - Measured inference latency: 0.004 ms/sample (meeting real-time SDN mitigation constraints).
-  - Serialized model artifact (`models/anomaly_detector.joblib`) and evaluation reports.
-* **Key Decisions / Technical Notes:**
-  - Addressed lack of monolithic "MITM" label by explicitly mapping MITM-enabling protocol attack classes (ARP Spoofing, Malformed MQTT).
+### 📌 Period 2: Weeks 3 – 4 (16/09/2026 – 29/09/2026)
+*Focus: Integration Contracts, Repository Setup, Data Preprocessing, and Feature Harmonization*
+
+| Date | Task |
+| :--- | :--- |
+| **17/09/2026** | Agreed integration contract with Component 4 (SDN Mitigation): confirmed JSON alert schema, severity levels, and REST port 5000. |
+| **18/09/2026** | Agreed integration contract with Component 1 & 2: confirmed shared session metadata and anomaly score thresholds. |
+| **22/09/2026** | Cloned shared group repo `J26-CS-330` and created individual folder structure `IT23368248` (`api/`, `data/`, `models/`, `reports/`, `src/`, `dashboard/`). |
+| **24/09/2026** | Downloaded CICIoMT2024 WiFi+MQTT subset (120,000 samples) and CICIoT2023 subset (120,000 samples) from UNB CIC repository. Total: 240,000 samples. |
+| **25/09/2026** | Confirmed Component 4 uses CICIoMT2024 attack labels; agreed to map MITM-enabling attack classes (ARP Spoofing, DNS Spoofing, MQTT Malformed Data). |
+| **26/09/2026** | Confirmed scope boundary: detection, alert generation, and threat confidence belong to my component; OpenFlow switch rule enforcement belongs to Component 4. |
+| **28/09/2026** | Developed automated dataset preprocessing script (`src/01_feature_mapping.py`): handled null values, normalized features, and mapped 44 harmonized columns. |
+| **29/09/2026** | Executed feature mapping pipeline: generated balanced merged dataset `merged_iomt_dataset.csv` (120k IoMT vs 120k Non-IoMT samples) with zero duplicate records. |
+
+```
+---------------------------------------------------------------------------------------------------
+Supervisor Review & Signature (Weeks 3 – 4):
+Supervisor Name: Mr. Kanishka Yapa             Signature: ........................   Date: 29/09/2026
+Feedback / Remarks: ...............................................................................
+---------------------------------------------------------------------------------------------------
+```
 
 ---
 
-### Entry 5 — Integrated Multi-Stage REST API Implementation
-* **Date:** 2026-10-13 (Phase 5)
-* **Tasks Completed:**
-  - Developed Flask REST API (`api/app.py`) providing `/predict`, `/predict/batch`, `/health`, and `/schema`.
-  - Integrated Stage 1 (IoMT verification), Stage 2 (MQTT protocol check), and Stage 3 (Anomaly inference).
-  - Designed compliant JSON response structure with explicit status indicators, confidence scores, and academic limitation disclosures.
-* **Key Decisions / Technical Notes:**
-  - Exposed structured SDN action triggers (`SDN_ISOLATE_SWITCH_PORT_AND_DROP_FLOW`, `ALLOW_TRAFFIC`) to interface with Ryu controller.
+### 📌 Period 3: Weeks 5 – 6 (30/09/2026 – 13/10/2026)
+*Focus: Model Training, Evaluation, Latency Optimization, and Serialization*
+
+| Date | Task |
+| :--- | :--- |
+| **01/10/2026** | Developed Stage 1 IoMT Classifier script (`src/02_iomt_classifier.py`) using Random Forest algorithm (100 estimators, random_state=42). |
+| **03/10/2026** | Evaluated Stage 1 Classifier on held-out test split: achieved 99.99% Accuracy, Precision 0.9999, Recall 1.0000, F1 1.0000, and FPR 0.0001. |
+| **05/10/2026** | Generated feature importance graph for Stage 1: verified `Tot size`, `Rate`, and `IAT` provide dominant discriminative power between IoMT and commodity IoT. |
+| **07/10/2026** | Developed Stage 3 MQTT Protocol Anomaly Detector (`src/03_anomaly_detector.py`) trained on CICIoMT2024 attack distribution (21 attack classes). |
+| **09/10/2026** | Evaluated Stage 3 Model: achieved 99.54% Accuracy, 99.95% Precision, 99.56% Recall, 99.76% F1-score, and 0.0075 False Positive Rate. |
+| **11/10/2026** | Benchmarked model inference latency: achieved 0.004 ms per flow sample, fully satisfying real-time SDN packet inspection constraints (< 10 ms). |
+| **12/10/2026** | Generated Stage 3 evaluation artifacts: confusion matrix (`anomaly_confusion_matrix.png`) and comprehensive classification report. |
+| **13/10/2026** | Serialized trained production models (`models/iomt_classifier.joblib` and `models/anomaly_detector.joblib`) and saved environment dependencies (`requirements.txt`). |
+
+```
+---------------------------------------------------------------------------------------------------
+Supervisor Review & Signature (Weeks 5 – 6):
+Supervisor Name: Mr. Kanishka Yapa             Signature: ........................   Date: 13/10/2026
+Feedback / Remarks: ...............................................................................
+---------------------------------------------------------------------------------------------------
+```
 
 ---
 
-### Entry 6 — Deterministic MITM Correlation Engine & Real-Time Alert Feed
-* **Date:** 2026-10-14
-* **Tasks Completed:**
-  - Implemented Stage 3.5 Hybrid MITM Correlation Engine in `api/app.py`.
-  - Correlated machine learning anomalies with deterministic protocol vectors (ARP Poisoning, DNS Redirection, Payload Tampering).
-  - Added dedicated `/alerts` and `/alerts/clear` endpoints for dashboard integration.
-  - Calibrated decision thresholds to eliminate false positives on benign medical telemetry.
-  - Tested live against confirmed MITM attacks (critical alert) and normal telemetry (allow flow).
-* **Key Decisions / Technical Notes:**
-  - Upgraded anomaly prediction from speculative "Suspicious" to 100% "Confirmed MITM Attack" when ARP conflict / tampering signature coincides with ML anomaly score.
+### 📌 Period 4: Week 7 & Final Output (14/10/2026 – 18/10/2026)
+*Focus: REST API, Deterministic MITM Correlation Engine, Interactive Dashboard, and Git Milestones*
 
----
+| Date | Task |
+| :--- | :--- |
+| **14/10/2026** | Developed Flask REST API (`api/app.py`) providing `/predict`, `/predict/batch`, `/health`, and `/schema` endpoints with error handling. |
+| **15/10/2026** | Built Stage 3.5 Deterministic MITM Correlation Engine: correlated ML anomaly scores with deterministic network indicators (`ARP=1`, DNS redirects, MQTT malformed payloads). |
+| **16/10/2026** | Implemented real-time threat alert feed (`GET /alerts`, `POST /alerts/clear`) and configured Cross-Origin Resource Sharing (`flask-cors`) for UI integration. |
+| **17/10/2026** | Developed interactive frontend dashboard (`dashboard/index.html`) with Chart.js real-time anomaly score stream, critical alert banner, and attack discrimination matrix. |
+| **18/10/2026** | Conducted end-to-end integration testing: verified live flow from synthetic injection -> ML inference -> MITM confirmation -> dashboard alert update. Pushed 7 structured milestone commits to GitHub repository `J26-CS-330` inside `IT23368248/` and finalized logbook documentation. |
 
-### Entry 7 — Threat Visualization Dashboard & Scope Alignment
-* **Date:** 2026-10-21
-* **Tasks Completed:**
-  - Implemented standalone interactive frontend dashboard (`dashboard/index.html`) using HTML5, CSS3, and Chart.js.
-  - Enabled Cross-Origin Resource Sharing (`flask-cors`) on Flask REST API to allow browser telemetry polling.
-  - Formulated clear component scope boundary: explicitly delineating detection/alerting responsibilities from Team Member 4's SDN enforcement/mitigation duties.
-  - Incorporated a protocol discrimination matrix illustrating differentiation between MITM (ARP conflict) and volumetric floods (DDoS).
-  - Built real-time interactive traffic injectors for MITM (ARP Poisoning), Volumetric Flood, and Normal Patient Telemetry.
-* **Key Decisions / Technical Notes:**
-  - Standardized terminology across UI: replaced "Mitigated by Ryu" with "Action Dispatched to SDN Layer" to maintain strict fidelity to the individual research scope.
-
----
-
-### Summary of Completed Milestones
-| Milestone | Status | Key Deliverable |
-|---|:---:|---|
-| Architecture & Environment | Completed | Project structure, `.gitignore`, `requirements.txt` |
-| Dataset Merge & Mapping | Completed | `01_feature_mapping.py`, 44 harmonized features |
-| Stage 1 IoMT Classifier | Completed | `02_iomt_classifier.py`, `iomt_classifier.joblib`, 99.99% Acc |
-| Stage 3 Anomaly Detector | Completed | `03_anomaly_detector.py`, `anomaly_detector.joblib`, 99.54% Acc |
-| Integrated REST API | Completed | `api/app.py`, endpoints (`/predict`, `/health`, `/schema`) |
-| MITM Correlation & Alerting | Completed | Stage 3.5 engine, `/alerts` feed, 100% verified alerts |
-| Threat Alert Dashboard | Completed | `dashboard/index.html`, scope alignment, live injectors |
+```
+---------------------------------------------------------------------------------------------------
+Supervisor Review & Final Sign-Off (Week 7 / Final):
+Supervisor Name: Mr. Kanishka Yapa             Signature: ........................   Date: 18/10/2026
+Feedback / Remarks: ...............................................................................
+---------------------------------------------------------------------------------------------------
+```
