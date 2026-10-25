@@ -1,0 +1,5 @@
+baseline,features,macro_f1,min_recall,p95_latency_ms,model_size_mb
+Baseline A (Full-Feature 44-Features),44,0.9079,0.713,1.1831,0.792
+Baseline B (Reduced-Feature 15-Features),15,0.9067,0.7237,0.9648,0.794
+Baseline C (Binary Benign vs Recon),15,0.9911,0.981,0.8043,0.171
+Baseline D (Hierarchical Two-Stage),15,0.8947,0.7234,1.8453,0.57
