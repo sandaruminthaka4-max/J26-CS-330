@@ -1,0 +1,6 @@
+Class,Train_Count,Val_Count,Test_Count,Total,Percentage
+Benign,154185,38547,37607,230339,63.68
+Ping Sweep,592,148,186,926,0.26
+Port Scan,67185,16796,22622,106603,29.47
+OS Scan,13466,3366,3834,20666,5.71
+Vulnerability Scan,1738,435,1034,3207,0.89

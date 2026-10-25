@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "warnings": [
+    "Constant features detected in training set: ['Drate']",
+    "Detected 385 feature vectors with identical hashes across train and test partitions."
+  ],
+  "errors": [],
+  "constant_features": [
+    "Drate"
+  ],
+  "nan_counts": {},
+  "inf_counts": {},
+  "train_val_overlap_count": 0,
+  "train_test_overlap_count": 385
+}

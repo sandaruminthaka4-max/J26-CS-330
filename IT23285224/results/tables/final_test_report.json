@@ -1,0 +1,79 @@
+{
+  "accuracy": 0.9598,
+  "macro_precision": 0.9532,
+  "macro_recall": 0.7834,
+  "macro_f1": 0.843,
+  "weighted_f1": 0.9569,
+  "benign_fpr": 0.0151,
+  "minimum_per_class_recall": 0.4033,
+  "per_class": {
+    "Benign": {
+      "precision": 0.9769,
+      "recall": 0.9849,
+      "f1_score": 0.9809,
+      "support": 37607
+    },
+    "Ping Sweep": {
+      "precision": 1.0,
+      "recall": 0.828,
+      "f1_score": 0.9059,
+      "support": 186
+    },
+    "Port Scan": {
+      "precision": 0.9379,
+      "recall": 0.9861,
+      "f1_score": 0.9614,
+      "support": 22622
+    },
+    "OS Scan": {
+      "precision": 0.9183,
+      "recall": 0.7149,
+      "f1_score": 0.8039,
+      "support": 3834
+    },
+    "Vulnerability Scan": {
+      "precision": 0.9329,
+      "recall": 0.4033,
+      "f1_score": 0.5631,
+      "support": 1034
+    }
+  },
+  "confusion_matrix": [
+    [
+      37038,
+      0,
+      558,
+      10,
+      1
+    ],
+    [
+      32,
+      154,
+      0,
+      0,
+      0
+    ],
+    [
+      125,
+      0,
+      22307,
+      169,
+      21
+    ],
+    [
+      255,
+      0,
+      830,
+      2741,
+      8
+    ],
+    [
+      462,
+      0,
+      90,
+      65,
+      417
+    ]
+  ],
+  "mean_brier_score": 0.012
+}
