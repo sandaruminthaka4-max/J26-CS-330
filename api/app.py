@@ -673,6 +673,12 @@ def clear_alerts():
     ALERT_HISTORY.clear()
     return jsonify({"status": "ok", "message": "Alert history cleared"}), 200
 
+@app.route("/download/viva-pdf", methods=["GET"])
+def download_viva_pdf():
+    """Download the Viva Voce preparation guide PDF."""
+    docs_dir = BASE / "docs"
+    return send_from_directory(docs_dir, "VIVA_VOCE_QA_MASTER_IT23368248.pdf", as_attachment=True)
+
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({
