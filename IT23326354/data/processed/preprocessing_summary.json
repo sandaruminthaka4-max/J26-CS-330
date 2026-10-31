@@ -1,0 +1,24 @@
+{
+  "dataset_source": "CICIoMT2024 (train_iomt.csv)",
+  "total_exported_rows": 156105,
+  "feature_count": 45,
+  "classes": {
+    "0": "Normal (benign)",
+    "1": "DoS (Attack)"
+  },
+  "train_rows": 109273,
+  "val_rows": 23416,
+  "test_rows": 23416,
+  "files": {
+    "train": "data/processed/train.csv",
+    "val": "data/processed/val.csv",
+    "test": "data/processed/test.csv"
+  },
+  "clean_stats": {
+    "initial_rows": 200000,
+    "duplicates_removed": 43895,
+    "inf_values_found": 0,
+    "nan_values_found": 0,
+    "final_rows": 156105
+  }
+}

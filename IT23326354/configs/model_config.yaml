@@ -1,0 +1,82 @@
+# Model configuration for DoS Detection XGBoost classifier
+# Project: J26-CS-330 | Component: DoS Detection via SDN Flow Analysis
+
+dataset:
+  zip_path: "data/raw/CICIoMT2024 DataSets.zip"
+  train_file: "train_iomt.csv"
+  test_file: "test_iomt.csv"
+  label_column: "label"
+  processed_dir: "data/processed"
+  interim_dir: "data/interim"
+
+# Labels: verified from actual full scan of train_iomt.csv (7,160,831 rows)
+# Dataset uses 'benign' (lowercase) for Normal traffic.
+label_mapping:
+  dos_labels:
+    # DDoS variants
+    - "DDoS UDP"       # 1,635,956 rows
+    - "DDoS ICMP"      # 1,537,476 rows
+    - "DDoS TCP"       #   804,465 rows
+    - "DDoS SYN"       #   801,962 rows
+    - "DDoS Publish Flood"  # 27,623 rows
+    # DoS variants
+    - "DoS UDP"        #   566,950 rows
+    - "DoS SYN"        #   441,903 rows
+    - "DoS ICMP"       #   416,292 rows
+    - "DoS TCP"        #   380,384 rows
+    - "DoS Connect Flood"   # 185,809 rows
+    - "DoS Publish Flood"   #  44,376 rows
+    # Reconnaissance
+    - "Port Scan"      #  83,981 rows
+    - "OS Scan"        #  16,832 rows
+    - "Ping Sweep"     #     740 rows
+    - "Recon VulScan"  #   2,173 rows
+    # Other attacks
+    - "ARP Spoofing"   #  16,047 rows
+    - "Malformed Data" #   5,130 rows
+  # NOTE: Only labels in this list + normal_labels will be kept.
+  # Rows with any other label are dropped with a warning.
+  normal_labels:
+    - "benign"         # 192,732 rows — VERIFIED lowercase in this dataset
+
+preprocessing:
+  random_seed: 42
+  test_size: 0.15        # fraction for final test set (from training CSV)
+  val_size: 0.15         # fraction for validation set (from remaining)
+  handle_inf: "replace"  # replace inf with NaN then fill
+  fill_strategy: "median"
+  remove_duplicates: true
+  # Class imbalance strategy: 'scale_pos_weight' (XGBoost native) or 'none'
+  imbalance_strategy: "scale_pos_weight"
+
+model:
+  type: "xgboost"
+  random_seed: 42
+  # XGBoost parameters — tuned conservatively for student hardware
+  params:
+    n_estimators: 200
+    max_depth: 6
+    learning_rate: 0.1
+    subsample: 0.8
+    colsample_bytree: 0.8
+    min_child_weight: 1
+    gamma: 0
+    reg_alpha: 0
+    reg_lambda: 1
+    tree_method: "hist"   # fast histogram method
+    eval_metric: "logloss"
+
+paths:
+  model_file: "models/xgboost_model.joblib"
+  preprocessor_file: "models/preprocessor.joblib"
+  feature_schema: "configs/feature_schema.json"
+  results_dir: "results"
+  figures_dir: "results/figures"
+  tables_dir: "results/tables"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  model_path: "models/xgboost_model.joblib"
+  preprocessor_path: "models/preprocessor.joblib"
+  schema_path: "configs/feature_schema.json"

@@ -1,0 +1,64 @@
+# dos-sdn-detection — gitignore
+# Project: J26-CS-330 | Individual Component: DoS Detection
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.env
+.venv
+venv/
+ENV/
+
+# === Dataset (too large for git) ===
+data/raw/
+data/interim/*.csv
+data/processed/*.csv
+*.zip
+*.gz
+*.tar
+
+# === Trained models ===
+models/*.joblib
+models/*.pkl
+models/*.model
+
+# === Results / outputs ===
+results/logs/*.log
+results/figures/*.png
+results/figures/*.pdf
+results/tables/*.csv
+results/tables/*.json
+
+# === IDE / OS ===
+.idea/
+.vscode/settings.json
+*.DS_Store
+Thumbs.db
+*.swp
+
+# === Jupyter ===
+.ipynb_checkpoints/
+*.ipynb
+
+# === Pytest cache ===
+.pytest_cache/
+.coverage
+htmlcov/
+
+# EXCEPTIONS: track config, schema, and requirements
+!configs/feature_schema.json
+!configs/model_config.yaml
+!requirements.txt
+!models/*.joblib
+!results/figures/*.png
+!results/figures/*.pdf
+!results/tables/*.csv
+!results/tables/*.json
